@@ -1,0 +1,98 @@
+[
+  {
+    "name": "Simran Ahuja",
+    "vibe": "Glamorous, outgoing, gossips over chai",
+    "traits": {
+      "sleep_schedule": "late",
+      "noise_tolerance": "high",
+      "sociability": "extrovert",
+      "cleanliness": "medium",
+      "spontaneity": "spontaneous"
+    },
+    "oneliner": "Those 2am maggi runs? Count me in 💅."
+  },
+  {
+    "name": "Meher Kaur",
+    "vibe": "Calm, neat freak, plant mom",
+    "traits": {
+      "sleep_schedule": "early",
+      "noise_tolerance": "low",
+      "sociability": "introvert",
+      "cleanliness": "high",
+      "spontaneity": "planner"
+    },
+    "oneliner": "Clean desk, calm mind — and coffee before convo."
+  },
+  {
+    "name": "Jannat Sheikh",
+    "vibe": "Techie + indie music nerd",
+    "traits": {
+      "sleep_schedule": "late",
+      "noise_tolerance": "medium",
+      "sociability": "ambivert",
+      "cleanliness": "medium",
+      "spontaneity": "mixed"
+    },
+    "oneliner": "We’ll vibe over indie playlists and coding sprints."
+  },
+  {
+    "name": "Tanvi Patel",
+    "vibe": "Family-oriented, Garba lover, food enthusiast",
+    "traits": {
+      "sleep_schedule": "early",
+      "noise_tolerance": "high",
+      "sociability": "extrovert",
+      "cleanliness": "medium",
+      "spontaneity": "planner"
+    },
+    "oneliner": "Dhokla for breakfast and dance breaks after!"
+  },
+  {
+    "name": "Shanaya",
+    "vibe": "Startup junkie, bookworm, strong opinions",
+    "traits": {
+      "sleep_schedule": "late",
+      "noise_tolerance": "low",
+      "sociability": "ambivert",
+      "cleanliness": "high",
+      "spontaneity": "planner"
+    },
+    "oneliner": "You bring snacks, I’ll bring the ambition."
+  },
+  {
+    "name": "Zainab Khan",
+    "vibe": "Beachy, soft spoken, artsy",
+    "traits": {
+      "sleep_schedule": "early",
+      "noise_tolerance": "medium",
+      "sociability": "introvert",
+      "cleanliness": "high",
+      "spontaneity": "mixed"
+    },
+    "oneliner": "If you like watercolor sunsets, we’ll get along."
+  },
+  {
+    "name": "Natasha Roy",
+    "vibe": "Intellectual + meme lord, chai > coffee",
+    "traits": {
+      "sleep_schedule": "mixed",
+      "noise_tolerance": "medium",
+      "sociability": "extrovert",
+      "cleanliness": "medium",
+      "spontaneity": "spontaneous"
+    },
+    "oneliner": "Witty convos at midnight? That’s the vibe."
+  },
+  {
+    "name": "Rini Das",
+    "vibe": "Nature girl, old soul, minimal tech",
+    "traits": {
+      "sleep_schedule": "early",
+      "noise_tolerance": "low",
+      "sociability": "introvert",
+      "cleanliness": "high",
+      "spontaneity": "planner"
+    },
+    "oneliner": "Peaceful mornings and filter coffee fix everything."
+  }
+]
