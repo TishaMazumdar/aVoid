@@ -4,7 +4,7 @@
     "question": "When do you feel most productive – early in the morning or late at night?",
     "trait": "daily_rhythm",
     "keywords": {
-      "morning": ["early", "sunrise", "morning", "6am", "7am", "daylight"],
+      "morning": ["early", "sunrise", "morning", "5am", "6am", "7am", "daylight"],
       "night": ["night", "late", "midnight", "2am", "after dark"]
     }
   },
@@ -13,7 +13,7 @@
     "question": "How do you prefer to spend your weekends?",
     "trait": "lifestyle",
     "keywords": {
-      "social": ["party", "hang out", "friends", "clubbing", "concert"],
+      "social": ["party", "hang out", "friends", "clubbing", "concert", "dance"],
       "chill": ["sleep", "read", "movies", "Netflix", "stay in", "relax"]
     }
   },
@@ -22,8 +22,8 @@
     "question": "Describe your ideal study or work setup.",
     "trait": "study_habits",
     "keywords": {
-      "quiet": ["quiet", "library", "alone", "peace", "silence"],
-      "collab": ["music", "group", "discussion", "talk", "buzz"]
+      "quiet": ["quiet", "library", "alone", "peace", "silence", "headphones"],
+      "collab": ["music", "group", "discussion", "talk", "buzz", "friends"]
     }
   },
   {
@@ -32,7 +32,8 @@
     "trait": "room_vibe",
     "keywords": {
       "cozy": ["warm", "cozy", "soft", "blanket", "fairy lights", "personal"],
-      "minimal": ["clean", "organized", "minimal", "neat", "white"]
+      "minimal": ["clean", "organized", "minimal", "neat", "white"],
+      "maximal": ["loud", "colourful", "bright", "trinkets", "clutter"]
     }
   },
   {
