@@ -1,6 +1,7 @@
 [
   {
     "name": "Simran Ahuja",
+    "dob": "2002-10-03",
     "vibe": "Glamorous, outgoing, gossips over chai",
     "traits": {
       "sleep_schedule": "late",
@@ -13,6 +14,7 @@
   },
   {
     "name": "Meher Kaur",
+    "dob": "2000-03-13",
     "vibe": "Calm, neat freak, plant mom",
     "traits": {
       "sleep_schedule": "early",
@@ -25,6 +27,7 @@
   },
   {
     "name": "Jannat Sheikh",
+    "dob": "2005-01-25",
     "vibe": "Techie + indie music nerd",
     "traits": {
       "sleep_schedule": "late",
@@ -37,60 +40,65 @@
   },
   {
     "name": "Tanvi Patel",
+    "dob": "2004-04-03",
     "vibe": "Family-oriented, Garba lover, food enthusiast",
     "traits": {
       "sleep_schedule": "early",
       "noise_tolerance": "high",
       "sociability": "extrovert",
-      "cleanliness": "medium",
+      "cleanliness": "low",
       "spontaneity": "planner"
     },
     "oneliner": "Dhokla for breakfast and dance breaks after!"
   },
   {
-    "name": "Shanaya",
+    "name": "Zainab Khan",
+    "dob": "2001-02-14",
     "vibe": "Startup junkie, bookworm, strong opinions",
     "traits": {
       "sleep_schedule": "late",
       "noise_tolerance": "low",
       "sociability": "ambivert",
-      "cleanliness": "high",
+      "cleanliness": "low",
       "spontaneity": "planner"
     },
     "oneliner": "You bring snacks, I’ll bring the ambition."
   },
   {
-    "name": "Zainab Khan",
+    "name": "Sharanya Hegde",
+    "dob": "2004-05-11",
     "vibe": "Beachy, soft spoken, artsy",
     "traits": {
       "sleep_schedule": "early",
       "noise_tolerance": "medium",
       "sociability": "introvert",
-      "cleanliness": "high",
-      "spontaneity": "mixed"
+      "cleanliness": "medium",
+      "spontaneity": "high"
     },
     "oneliner": "If you like watercolor sunsets, we’ll get along."
   },
   {
     "name": "Natasha Roy",
-    "vibe": "Intellectual + meme lord, chai > coffee",
+    "dob": "2004-04-01",
+    "vibe": "Intellectual + meme lord, coffee > chai",
     "traits": {
       "sleep_schedule": "mixed",
       "noise_tolerance": "medium",
       "sociability": "extrovert",
-      "cleanliness": "medium",
+      "cleanliness": "high",
       "spontaneity": "spontaneous"
     },
     "oneliner": "Witty convos at midnight? That’s the vibe."
   },
   {
-    "name": "Rini Das",
-    "vibe": "Nature girl, old soul, minimal tech",
+    "name": "Vidhi Mittal",
+    "dob": "2003-12-08",
+    "vibe": "Nature girl, old soul, lover girl",
     "traits": {
-      "sleep_schedule": "early",
+      "sleep_schedule": "late",
       "noise_tolerance": "low",
-      "sociability": "introvert",
-      "cleanliness": "high",
+      "sociability": "ambivert",
+      "cleanliness": "low",
       "spontaneity": "planner"
     },
     "oneliner": "Peaceful mornings and filter coffee fix everything."
