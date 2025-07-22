@@ -1,4 +1,3 @@
-# Traits being compared
 TRAITS = [
     "daily_rhythm",
     "lifestyle",
@@ -6,10 +5,6 @@ TRAITS = [
     "room_vibe",
     "conflict_style"
 ]
-
-# Points for scoring
-PERFECT_MATCH_SCORE = 20
-ACCEPTABLE_MATCH_SCORE = 10
 
 # Acceptable (but not perfect) matches
 ACCEPTABLE_MATCHES = {
@@ -21,71 +16,72 @@ ACCEPTABLE_MATCHES = {
         "social": ["chill"],
         "chill": ["social"]
     },
-    "study_habits": {
-        # No acceptable cross-match defined — either compatible or not
-    },
+    "study_habits": {},
     "room_vibe": {
         "cozy": ["minimal"],
         "minimal": ["cozy"]
     },
-    "conflict_style": {
-        # No acceptable cross-match defined — incompatible
-    }
+    "conflict_style": {}
 }
 
-def score_compatibility(p1: dict, p2: dict) -> int:
-    """
-    Scores compatibility between two personas based on shared traits.
-    Returns a total score.
-    """
-    score = 0
-    traits1 = p1.get("traits", {})
-    traits2 = p2.get("traits", {})
+def compute_compatibility(traits1, traits2):
+    """Simple matching: +2 for full match, +1 for partial (same group), 0 otherwise."""
+    if not traits1 or not traits2:
+        return 0
 
-    for trait in TRAITS:
-        t1 = traits1.get(trait)
-        t2 = traits2.get(trait)
+    matching_traits = 0
+    total_traits = len(traits1)
 
-        if not t1 or not t2:
-            continue
+    for key in traits1:
+        if key in traits2:
+            if traits1[key] == traits2[key]:
+                matching_traits += 1
 
-        if t1 == t2:
-            score += PERFECT_MATCH_SCORE
-        elif t2 in ACCEPTABLE_MATCHES.get(trait, {}).get(t1, []):
-            score += ACCEPTABLE_MATCH_SCORE
-
+    # Normalize to a score out of 10
+    score = (matching_traits / total_traits) * 10
     return score
+
+def compute_logistics_score(user_prefs, room):
+    matches = 0
+    if user_prefs["room_type"] == room["type"]:
+        matches += 1
+    if user_prefs["floor"] == room["floor"]:
+        matches += 1
+    if user_prefs["has_window"] == room["has_window"]:
+        matches += 1
+    return (matches / 3) * 10  # Normalize to 10
+
 
 def match_user_to_rooms(new_user, rooms):
     best_room = None
     best_score = -1
 
-    if occupants:
-        for occupant in occupants:
-            individual_score = score_compatibility(new_user, occupant)
-            print(f"Compared with {occupant.get('name', 'Unnamed')}: {individual_score}")
-
     for room in rooms:
-        occupants = room.get("occupants", [])
-        capacity = room.get("capacity", 0)
+        if len(room.get("occupants", [])) >= room["capacity"]:
+            continue
 
-        if len(occupants) >= capacity:
-            continue  # skip full rooms
+        compatibility_total = 0
 
-        if not occupants:
-            avg_score = 0  # no one inside yet, neutral
+        # Roommate compatibility
+        if room.get("occupants"):
+            for occupant in room["occupants"]:
+                compatibility_total += compute_compatibility(new_user["traits"], occupant["traits"])
+            compatibility_score = compatibility_total / len(room["occupants"])
         else:
-            total_score = sum(
-                score_compatibility(new_user, occupant)
-                for occupant in occupants
-            )
-            avg_score = total_score / len(occupants)
+            # No roommate yet, assume neutral compatibility
+            compatibility_score = 5
 
-        if avg_score > best_score:
-            best_score = avg_score
-            best_room = room
+        # Logistics preference score
+        logistics_score = compute_logistics_score(new_user["preferences"], room)
 
-    if best_room:
-        return best_room["room_id"], best_score
-    else:
-        return None, 0  # no available room
+        # Debug print for individual scores
+        print(f"DEBUG | Room {room['room_id']} -> Compatibility Score: {compatibility_score}, Logistics Score: {logistics_score}")
+
+        # Weighted hybrid score
+        final_score = 0.9 * compatibility_score + 0.1 * logistics_score
+
+        if final_score > best_score:
+            best_score = final_score
+            best_room = room["room_id"]
+
+    return best_room, f"{round(best_score * 10, 1)}%"
