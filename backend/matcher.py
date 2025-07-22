@@ -1,3 +1,5 @@
+from datetime import datetime
+
 TRAITS = [
     "daily_rhythm",
     "lifestyle",
@@ -23,6 +25,28 @@ ACCEPTABLE_MATCHES = {
     },
     "conflict_style": {}
 }
+
+def calculate_life_path_number(dob: str) -> int:
+    """Calculate numerology life path number from DOB (yyyy-mm-dd)."""
+    digits = [int(char) for char in dob if char.isdigit()]
+    total = sum(digits)
+    
+    while total > 9:
+        total = sum(int(d) for d in str(total))
+    
+    return total
+
+def numerology_score(user_number: int, other_number: int) -> float:
+    """Returns compatibility score between two life path numbers (out of 5)."""
+    diff = abs(user_number - other_number)
+    if diff == 0:
+        return 5
+    elif diff == 1:
+        return 3
+    elif diff == 2:
+        return 2
+    else:
+        return 0
 
 def compute_compatibility(traits1, traits2):
     """Simple matching: +2 for full match, +1 for partial (same group), 0 otherwise."""
@@ -74,11 +98,28 @@ def match_user_to_rooms(new_user, rooms):
         # Logistics preference score
         logistics_score = compute_logistics_score(new_user["preferences"], room)
 
+        # Numerology for new user
+        user_life_path = calculate_life_path_number(new_user["dob"])
+        numerology_scores = []
+
+        # For each occupant, compare numerology
+        for occupant in room["occupants"]:
+            if "dob" in occupant:
+                occupant_path = calculate_life_path_number(occupant["dob"])
+                score = numerology_score(user_life_path, occupant_path)
+                numerology_scores.append(score)
+
+        # Average numerology score (0 if no one has DOB)
+        numerology_score_value = (
+            sum(numerology_scores) / len(numerology_scores)
+            if numerology_scores else 0
+        )
+
         # Debug print for individual scores
-        print(f"DEBUG | Room {room['room_id']} -> Compatibility Score: {compatibility_score}, Logistics Score: {logistics_score}")
+        print(f"DEBUG | Room {room['room_id']} -> Compatibility Score: {compatibility_score}, Logistics Score: {logistics_score}, Numerology Score: {numerology_score_value}")
 
         # Weighted hybrid score
-        final_score = 0.9 * compatibility_score + 0.1 * logistics_score
+        final_score = (0.7 * compatibility_score + 0.2 * logistics_score + 0.1 * numerology_score_value)
 
         if final_score > best_score:
             best_score = final_score
