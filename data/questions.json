@@ -5,7 +5,7 @@
     "trait": "daily_rhythm",
     "keywords": {
       "morning": ["early", "sunrise", "morning", "5am", "6am", "7am", "daylight"],
-      "night": ["night", "late", "midnight", "2am", "after dark"]
+      "night": ["night", "late", "midnight", "2am", "after dark", "never"]
     }
   },
   {
