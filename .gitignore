@@ -1,45 +1,6 @@
-# Python cache
 __pycache__/
-*.py[cod]
-
-# Local virtual environment
-venv/
+*.pyc
 .env
-
-# Firebase keys and secrets
 firebase-key.json
-
-# VSCode/editor configs
 .vscode/
 .idea/
-
-# System files
-.DS_Store
-Thumbs.db
-
-# Build artifacts (if any frontend tooling used)
-dist/
-build/
-
-# Node (if using React or npm-based swipe UI)
-node_modules/
-*.log
-*.lock
-package-lock.json
-yarn.lock
-.pnpm-debug.log
-
-# Static files cache or uploads (if you ever store temp files)
-static/uploads/
-*.tmp
-*.bak
-
-# Coverage/debug/testing (even if you're not using it now)
-.coverage
-*.cover
-.cache/
-
-# Optional: compiled JS/CSS if you're using bundlers
-*.min.js
-*.min.css
-*.map
