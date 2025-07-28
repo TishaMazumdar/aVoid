@@ -7,10 +7,14 @@
       "daily_rhythm": "night",
       "lifestyle": "social",
       "study_habits": "collab",
-      "cleanliness": "minimal",
+      "room_vibe": "minimal",
       "conflict_style": "direct"
     },
-    "oneliner": "Those 2am maggi runs? Count me in 💅."
+    "room_preferences": {
+        "type": "twin",
+        "floor": "first",
+        "has_window": true
+    }
   },
   {
     "name": "Meher Kaur",
@@ -20,10 +24,14 @@
       "daily_rhythm": "morning",
       "lifestyle": "chill",
       "study_habits": "quiet",
-      "cleanliness": "cozy",
+      "room_vibe": "cozy",
       "conflict_style": "avoidant"
     },
-    "oneliner": "Clean desk, calm mind — and coffee before convo."
+    "room_preferences": {
+        "type": "twin",
+        "floor": "ground",
+        "has_window": true
+    }
   },
   {
     "name": "Jannat Sheikh",
@@ -33,10 +41,14 @@
       "daily_rhythm": "night",
       "lifestyle": "chill",
       "study_habits": "collab",
-      "cleanliness": "maximal",
+      "room_vibe": "maximal",
       "conflict_style": "direct"
     },
-    "oneliner": "We’ll vibe over indie playlists and coding sprints."
+    "room_preferences": {
+        "type": "twin",
+        "floor": "first",
+        "has_window": false
+    }
   },
   {
     "name": "Tanvi Patel",
@@ -46,10 +58,14 @@
       "daily_rhythm": "morning",
       "lifestyle": "social",
       "study_habits": "collab",
-      "cleanliness": "cozy",
+      "room_vibe": "cozy",
       "conflict_style": "avoidant"
     },
-    "oneliner": "Dhokla for breakfast and dance breaks after!"
+    "room_preferences": {
+        "type": "triple",
+        "floor": "first",
+        "has_window": false
+    }
   },
   {
     "name": "Zainab Khan",
@@ -62,7 +78,11 @@
       "room_vibe": "minimal",
       "conflict_style": "avoidant"
     },
-    "oneliner": "You bring snacks, I’ll bring the ambition."
+    "room_preferences": {
+        "type": "twin",
+        "floor": "ground",
+        "has_window": true
+    }
   },
   {
     "name": "Sharanya Hegde",
@@ -72,10 +92,14 @@
       "daily_rhythm": "morning",
       "lifestyle": "social",
       "study_habits": "quiet",
-      "cleanliness": "cozy",
+      "room_vibe": "cozy",
       "conflict_style": "avoidant"
     },
-    "oneliner": "If you like watercolor sunsets, we’ll get along."
+    "room_preferences": {
+        "type": "twin",
+        "floor": "first",
+        "has_window": true
+    }
   },
   {
     "name": "Natasha Roy",
@@ -85,10 +109,14 @@
       "daily_rhythm": "morning",
       "lifestyle": "chill",
       "study_habits": "collab",
-      "cleanliness": "social",
+      "room_vibe": "social",
       "conflict_style": "direct"
     },
-    "oneliner": "Witty convos at midnight? That’s the vibe."
+    "room_preferences": {
+        "type": "triple",
+        "floor": "ground",
+        "has_window": false
+    }
   },
   {
     "name": "Vidhi Mittal",
@@ -98,9 +126,13 @@
       "daily_rhythm": "night",
       "lifestyle": "chill",
       "study_habits": "collab",
-      "cleanliness": "chill",
+      "room_vibe": "chill",
       "conflict_style": "avoidant"
     },
-    "oneliner": "Peaceful mornings and filter coffee fix everything."
+    "room_preferences": {
+        "type": "twin",
+        "floor": "first",
+        "has_window": true
+    }
   }
 ]
