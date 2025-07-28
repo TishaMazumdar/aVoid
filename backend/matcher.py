@@ -1,5 +1,3 @@
-from datetime import datetime
-
 TRAITS = [
     "daily_rhythm",
     "lifestyle",
