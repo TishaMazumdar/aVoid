@@ -10,7 +10,7 @@ app = FastAPI()
 with open("data/rooms.json", "r") as f:
     ROOM_DATA = json.load(f)
 
-@app.post("/webhook")
+@app.post("/")
 async def receive_webhook(request: Request):
     try:
         body = await request.body()
