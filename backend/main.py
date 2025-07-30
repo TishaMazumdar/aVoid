@@ -13,11 +13,10 @@ with open("data/rooms.json", "r") as f:
 @app.post("/webhook")
 async def receive_webhook(request: Request):
     try:
-        data = await request.json()
-        print("🔔 Received webhook data:", data)
+        body = await request.body()
+        print("🧾 Raw request body:", body.decode("utf-8"))  # decode raw bytes
 
-        # Just return what you received
-        return JSONResponse(content={"received": data})
+        return JSONResponse(content={"raw_body": body.decode("utf-8")})
 
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": str(e)})
