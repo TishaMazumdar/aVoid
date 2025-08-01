@@ -6,12 +6,10 @@ import os
 from dotenv import load_dotenv
 import re
 from fastapi import Body
-from backend.matcher import match_user_to_rooms
 
 from firebase.firebase_utils import (
     create_user_if_not_exists,
     get_user,
-    update_traits,
     save_user
 )
 
@@ -102,17 +100,3 @@ def admin_debug(request: Request):
     from firebase.firebase_utils import get_all_users
     users = get_all_users()
     return JSONResponse(users)
-
-@app.post("/generate_matches")
-async def generate_matches(request: Request):
-    body = await request.json()
-    user_id = body.get("user_id")
-
-    user = get_user_by_id(user_id)
-    rooms = get_all_rooms()
-
-    if not user:
-        return JSONResponse({"error": "User not found"}, status_code=404)
-
-    matches = match_user_to_rooms(user, rooms)
-    return JSONResponse(matches)
