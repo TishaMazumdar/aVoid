@@ -14,11 +14,17 @@
     }
     .wrapper {
       display: flex;
+      flex-direction: column;
+      align-items: center;
       gap: 40px;
       background: white;
       padding: 30px 40px;
       border-radius: 15px;
       box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    .form-container {
+      display: flex;
+      gap: 40px;
     }
     .form-box {
       width: 300px;
@@ -40,13 +46,15 @@
       border-radius: 5px;
       border: 1px solid #ccc;
     }
-    input[type="submit"] {
+    input[type="submit"], .logout-button {
       background-color: #5a5af3;
       color: white;
       padding: 10px;
       border: none;
       border-radius: 5px;
       cursor: pointer;
+      text-align: center;
+      text-decoration: none;
     }
     .error {
       color: red;
@@ -64,35 +72,43 @@
 </head>
 <body>
   <div class="wrapper">
-    <!-- Signup -->
-    <div class="form-box">
-      <h2>Sign Up</h2>
-      {% if signup_error %}
-        <p class="error">{{ signup_error }}</p>
-      {% elif signup_success %}
-        <p class="success">{{ signup_success }}</p>
-      {% endif %}
-      <form action="/signup" method="post">
-        <input type="text" name="name" placeholder="Full Name" required />
-        <input type="email" name="email" placeholder="Email Address" required />
-        <input type="password" name="password" placeholder="Password" required />
-        <input type="date" name="dob" placeholder="Date of Birth" required />
-        <input type="submit" value="Sign Up" />
-      </form>
-    </div>
+    {% if name %}
+      <h2>Welcome, {{ name }}!</h2>
+      <p>DOB: {{ dob }}</p>
+      <a href="/logout" class="logout-button">Log Out</a>
+    {% else %}
+      <div class="form-container">
+        <!-- Signup -->
+        <div class="form-box">
+          <h2>Sign Up</h2>
+          {% if signup_error %}
+            <p class="error">{{ signup_error }}</p>
+          {% elif signup_success %}
+            <p class="success">{{ signup_success }}</p>
+          {% endif %}
+          <form action="/signup" method="post">
+            <input type="text" name="name" placeholder="Full Name" required />
+            <input type="email" name="email" placeholder="Email Address" required />
+            <input type="password" name="password" placeholder="Password" required />
+            <input type="date" name="dob" placeholder="Date of Birth" required />
+            <input type="submit" value="Sign Up" />
+          </form>
+        </div>
 
-    <!-- Login -->
-    <div class="form-box">
-      <h2>Log In</h2>
-      {% if login_error %}
-        <p class="error">{{ login_error }}</p>
-      {% endif %}
-      <form action="/login" method="post">
-        <input type="email" name="email" placeholder="Email Address" required />
-        <input type="password" name="password" placeholder="Password" required />
-        <input type="submit" value="Log In" />
-      </form>
-    </div>
+        <!-- Login -->
+        <div class="form-box">
+          <h2>Log In</h2>
+          {% if login_error %}
+            <p class="error">{{ login_error }}</p>
+          {% endif %}
+          <form action="/login" method="post">
+            <input type="email" name="email" placeholder="Email Address" required />
+            <input type="password" name="password" placeholder="Password" required />
+            <input type="submit" value="Log In" />
+          </form>
+        </div>
+      </div>
+    {% endif %}
   </div>
 </body>
 </html>

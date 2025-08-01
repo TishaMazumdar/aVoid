@@ -50,19 +50,19 @@ def login_user(email: str, password: str) -> bool:
         return False
     return user["password"] == hash_password(password)
 
-# ---------- Sessions ----------
+# ---------- Current Users ----------
 
-SESSIONS_FILE = "backend/data/sessions.json"
+CURRENT_USERS_FILE = "backend/data/current_users.json"
 
-def load_sessions():
-    if not os.path.exists(SESSIONS_FILE):
-        return {}
-    with open(SESSIONS_FILE, "r") as f:
+def load_current_users():
+    if not os.path.exists(CURRENT_USERS_FILE):
+        return []
+    with open(CURRENT_USERS_FILE, "r") as f:
         return json.load(f)
 
-def save_sessions(sessions):
-    with open(SESSIONS_FILE, "w") as f:
-        json.dump(sessions, f, indent=2)
+def save_current_users(users):
+    with open(CURRENT_USERS_FILE, "w") as f:
+        json.dump(users, f, indent=2)
 
 # ---------- Routes ----------
 
@@ -135,20 +135,20 @@ def signup(
 def login(request: Request, email: str = Form(...), password: str = Form(...)):
     users = load_users()
     user = users.get(email)
+
     if not user or user["password"] != hash_password(password):
-        return templates.TemplateResponse("index.html", {"request": request, "login_error": "Invalid email or password"})
+        return templates.TemplateResponse("index.html", {
+            "request": request,
+            "login_error": "Invalid email or password"
+        })
 
     request.session["email"] = email
-    sessions = load_sessions()
-    user = users[email]
 
-    sessions[email] = {
-        "name": user["name"],
-        "dob": user["dob"],
-        "logged_in": True,
-        "timestamp": datetime.now().isoformat()
-    }
-    save_sessions(sessions)
+    current_users = load_current_users()
+    if email not in current_users:
+        current_users.append(email)
+        save_current_users(current_users)
+
     return RedirectResponse("/", status_code=302)
 
 @app.get("/logout")
@@ -156,10 +156,9 @@ def logout(request: Request):
     email = request.session.get("email")
     request.session.clear()
 
-    sessions = load_sessions()
-    if email in sessions:
-        sessions[email]["logged_in"] = False
-        sessions[email]["timestamp"] = datetime.now().isoformat()
-        save_sessions(sessions)
+    current_users = load_current_users()
+    if email in current_users:
+        current_users.remove(email)
+        save_current_users(current_users)
 
-    return RedirectResponse("/", status_code=302)
+    return RedirectResponse("/login", status_code=302)
