@@ -78,7 +78,8 @@ def home(request: Request):
     return templates.TemplateResponse("index.html", {
         "request": request,
         "name": user["name"],
-        "dob": user["dob"]
+        "dob": user["dob"],
+        email: email
     })
 
 @app.get("/login")
