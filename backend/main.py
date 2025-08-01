@@ -2,214 +2,118 @@ from fastapi import FastAPI, Request, Form
 from fastapi.responses import RedirectResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
-import json
 import os
 from dotenv import load_dotenv
-import hashlib
 import re
-from datetime import datetime
+from fastapi import Body
+from matcher import assign_best_room
+
+from firebase.firebase_utils import (
+    create_user_if_not_exists,
+    get_user,
+    update_traits,
+    save_user
+)
 
 load_dotenv()
-SECRET_KEY = os.getenv("SECRET_KEY")
 
 app = FastAPI()
-app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY)
+app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY"))
 
-templates = Jinja2Templates(directory="static")
-USERS_FILE = "backend/data/users.json"
+templates = Jinja2Templates(directory="templates")
 
-
-# ---------- Auth Logic ----------
-
-def hash_password(password: str) -> str:
-    return hashlib.sha256(password.encode()).hexdigest()
-
-def load_users():
-    if not os.path.exists(USERS_FILE):
-        return {}
-    with open(USERS_FILE, "r") as f:
-        return json.load(f)
-
-def save_users(users):
-    with open(USERS_FILE, "w") as f:
-        json.dump(users, f, indent=2)
-
-def signup_user(email: str, password: str) -> bool:
-    users = load_users()
-    if email in users:
-        return False
-    hashed = hash_password(password)
-    users[email] = {"password": hashed}
-    save_users(users)
-    return True
-
-def login_user(email: str, password: str) -> bool:
-    users = load_users()
-    user = users.get(email)
-    if not user:
-        return False
-    return user["password"] == hash_password(password)
-
-# ---------- Current Users ----------
-
-CURRENT_USERS_FILE = "backend/data/current_users.json"
-
-def load_current_user():
-    if not os.path.exists(CURRENT_USERS_FILE):
-        return None
-    with open(CURRENT_USERS_FILE, "r") as f:
-        return json.load(f)
-
-def save_current_user(email: str):
-    with open(CURRENT_USERS_FILE, "w") as f:
-        json.dump(email, f)
-
-# ---------- Routes ----------
-
-@app.get("/")
+@app.get("/", response_class=JSONResponse)
 def home(request: Request):
     email = request.session.get("email")
-    users = load_users()
+    if not email:
+        return RedirectResponse("/login")
 
-    if not email or email not in users:
-        return RedirectResponse("/login", status_code=302)
-
-    user = users[email]
+    user = get_user(email)
     return templates.TemplateResponse("index.html", {
         "request": request,
-        "name": user["name"],
-        "dob": user["dob"],
-        "email": email
+        "email": email,
+        "user": user
     })
 
 @app.get("/login")
 def login_page(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse("login.html", {"request": request})
 
-@app.get("/signup")
-def signup_page(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
-
-@app.post("/signup")
-def signup(
-    request: Request,
-    name: str = Form(...),
-    email: str = Form(...),
-    password: str = Form(...),
-    dob: str = Form(...)
-):
-    users = load_users()
-
-    # Basic regex: must end in @<something>.com
-    if not re.match(r"[^@]+@[^@]+\.[cC][oO][mM]$", email):
-        return templates.TemplateResponse("index.html", {
-            "request": request,
-            "signup_error": "Enter a valid email ending with .com"
-        })
-
-    if email in users:
-        return templates.TemplateResponse("index.html", {
-            "request": request,
-            "signup_error": "Email already registered"
-        })
-
-    users[email] = {
-        "name": name,
-        "password": hash_password(password),
-        "dob": dob,
-        "vibe": "",
-        "traits": {},
-        "room_preferences": {},
-        "assigned_room": None
-    }
-
-    save_users(users)
+@app.post("/google-login")
+def google_login(request: Request, email: str = Form(...), name: str = Form(...)):
+    # No need for manual email validation
+    create_user_if_not_exists(email=email, name=name)
     request.session["email"] = email
-
-    save_current_user(email)
-
-    return templates.TemplateResponse("index.html", {
-        "request": request,
-        "email": email,
-        "signup_success": "Signup successful!"
-    })
-
-@app.post("/login")
-def login(request: Request, email: str = Form(...), password: str = Form(...)):
-    users = load_users()
-    user = users.get(email)
-
-    if not user or user["password"] != hash_password(password):
-        return templates.TemplateResponse("index.html", {
-            "request": request,
-            "login_error": "Invalid email or password"
-        })
-
-    request.session["email"] = email
-
-    save_current_user(email)
-
     return RedirectResponse("/", status_code=302)
 
 @app.get("/logout")
 def logout(request: Request):
-    email = request.session.get("email")
-    if load_current_user() == email:
-        save_current_user(None)
     request.session.clear()
-    return RedirectResponse("/login", status_code=302)
+    return RedirectResponse("/login")
 
-@app.get("/receive_traits")
-def get_traits(request: Request):
-    current_users = load_current_user()
-    if not current_users:
-        return JSONResponse({"status": "no user currently logged in"}, status_code=400)
-
-    email = current_users[0]
-    users = load_users()
-    if email not in users:
-        return JSONResponse({"status": "user not found"}, status_code=404)
-
-    traits = users[email].get("traits", {})
-    return JSONResponse({"traits": traits})
-
-def load_questions():
-    with open("backend/data/questions.json", "r", encoding="utf-8") as f:
-        return json.load(f)
-
-def map_trait_value(trait, answer, questions):
-    answer = answer.lower()
-    for q in questions:
-        if q["trait"] == trait:
-            for group, keywords in q["keywords"].items():
-                for keyword in keywords:
-                    if keyword in answer:
-                        return group
-    return answer  # fallback to raw answer if no match
-
-@app.post("/receive_traits")
-async def receive_traits(request: Request):
-    data = await request.json()
-    print("Webhook received:", data)
-
-    extracted = data.get("call_report", {}).get("extracted_variables", {})
-    if isinstance(extracted, list):
-        extracted = {item["key"]: item["value"] for item in extracted if "key" in item and "value" in item}
-
-    email = email = load_current_user()
+@app.post("/update_preferences")
+def update_preferences(request: Request, type: str = Form(...), floor: str = Form(...), has_window: str = Form(...)):
+    email = request.session.get("email")
     if not email:
-        return JSONResponse({"status": "no user currently logged in"}, status_code=400)
+        return RedirectResponse("/login")
 
-    users = load_users()
-    if email not in users:
-        return JSONResponse({"status": "user not found"}, status_code=404)
+    user = get_user(email)
+    user["room_preferences"] = {
+        "type": type,
+        "floor": floor,
+        "has_window": has_window
+    }
 
-    # ✅ Save the traits
-    questions = load_questions()
-    users[email].setdefault("traits", {})
-    for trait, answer in extracted.items():
-        users[email]["traits"][trait] = map_trait_value(trait, str(answer), questions)
+    save_user(email, user)
+    return RedirectResponse("/", status_code=302)
 
-    save_users(users)
+@app.post("/update_dob")
+def update_dob(request: Request, dob: str = Form(...)):
+    email = request.session.get("email")
+    if not email:
+        return RedirectResponse("/login")
 
-    return JSONResponse({"status": "traits saved successfully"})
+    user = get_user(email)
+    user["dob"] = dob
+    save_user(email, user)
+    return RedirectResponse("/", status_code=302)
+
+@app.post("/webhook")
+async def receive_webhook(data: dict = Body(...)):
+    email = data.get("email")
+    name = data.get("name")
+    dob = data.get("dob")
+    traits = data.get("traits")
+
+    if not email or not traits:
+        return JSONResponse({"error": "Missing email or traits"}, status_code=400)
+
+    create_user_if_not_exists(email=email, name=name)
+    
+    user = get_user(email)
+    user["dob"] = dob
+    user["traits"] = traits
+    save_user(email, user)
+
+    return JSONResponse({"message": "Data received and stored."})
+
+@app.post("/assign_room")
+def assign_room(request: Request):
+    email = request.session.get("email")
+    if not email:
+        return RedirectResponse("/login")
+
+    user = get_user(email)
+    room_id, score = assign_best_room(user)
+
+    user["assigned_room"] = room_id
+    user["match_score"] = f"{score:.2f}%"
+    save_user(email, user)
+
+    return RedirectResponse("/", status_code=302)
+
+@app.get("/admin")
+def admin_debug(request: Request):
+    from firebase.firebase_utils import get_all_users
+    users = get_all_users()
+    return JSONResponse(users)

@@ -4,3 +4,4 @@ __pycache__/
 .vscode/
 .idea/
 backend/test.py
+firebase/firebase-key.json
