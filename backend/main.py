@@ -6,7 +6,7 @@ import os
 from dotenv import load_dotenv
 import re
 from fastapi import Body
-from backend.matcher import assign_best_room
+from backend.matcher import match_user_to_rooms
 
 from firebase.firebase_utils import (
     create_user_if_not_exists,
@@ -97,23 +97,22 @@ async def receive_webhook(data: dict = Body(...)):
 
     return JSONResponse({"message": "Data received and stored."})
 
-@app.post("/assign_room")
-def assign_room(request: Request):
-    email = request.session.get("email")
-    if not email:
-        return RedirectResponse("/login")
-
-    user = get_user(email)
-    room_id, score = assign_best_room(user)
-
-    user["assigned_room"] = room_id
-    user["match_score"] = f"{score:.2f}%"
-    save_user(email, user)
-
-    return RedirectResponse("/", status_code=302)
-
 @app.get("/admin")
 def admin_debug(request: Request):
     from firebase.firebase_utils import get_all_users
     users = get_all_users()
     return JSONResponse(users)
+
+@app.post("/generate_matches")
+async def generate_matches(request: Request):
+    body = await request.json()
+    user_id = body.get("user_id")
+
+    user = get_user_by_id(user_id)
+    rooms = get_all_rooms()
+
+    if not user:
+        return JSONResponse({"error": "User not found"}, status_code=404)
+
+    matches = match_user_to_rooms(user, rooms)
+    return JSONResponse(matches)
