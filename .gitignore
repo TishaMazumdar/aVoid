@@ -5,3 +5,4 @@ __pycache__/
 .idea/
 backend/data/sessions.json
 backend/data/users.json
+backend/test.py
