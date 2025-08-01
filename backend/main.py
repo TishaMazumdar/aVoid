@@ -126,6 +126,12 @@ def signup(
     save_users(users)
     request.session["email"] = email
 
+    # Add to current_users.json
+    current_users = load_current_users()
+    if email not in current_users:
+        current_users.append(email)
+        save_current_users(current_users)
+
     return templates.TemplateResponse("index.html", {
         "request": request,
         "email": email,
@@ -155,13 +161,11 @@ def login(request: Request, email: str = Form(...), password: str = Form(...)):
 @app.get("/logout")
 def logout(request: Request):
     email = request.session.get("email")
-    request.session.clear()
-
     current_users = load_current_users()
     if email in current_users:
         current_users.remove(email)
         save_current_users(current_users)
-
+    request.session.clear()
     return RedirectResponse("/login", status_code=302)
 
 @app.get("/receive_traits")
