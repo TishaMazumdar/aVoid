@@ -5,3 +5,5 @@
 - smart ai matching
 - AI-powered explanations
 - AI-based Icebreakers
+- Numerology based matching
+- 
