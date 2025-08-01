@@ -1,6 +1,6 @@
-**MatchMyVibe**
+# **MatchMyVibe**
 
-# OUR FEATURES:
+ OUR FEATURES:
 - voice first compact survey
 - smart ai matching
 - AI-powered explanations
