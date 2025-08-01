@@ -79,7 +79,7 @@ def home(request: Request):
         "request": request,
         "name": user["name"],
         "dob": user["dob"],
-        email: email
+        "email": email
     })
 
 @app.get("/login")
