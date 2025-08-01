@@ -1,6 +1,7 @@
 __pycache__/
 *.pyc
 .env
-firebase-key.json
 .vscode/
 .idea/
+backend/data/sessions.json
+backend/data/users.json
