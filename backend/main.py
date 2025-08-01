@@ -6,7 +6,7 @@ import os
 from dotenv import load_dotenv
 import re
 from fastapi import Body
-from matcher import assign_best_room
+from backend.matcher import assign_best_room
 
 from firebase.firebase_utils import (
     create_user_if_not_exists,
