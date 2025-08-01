@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MatchMyVibe - Find Your Perfect Roommate</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8B5CF6;
+            --primary-dark: #7C3AED;
+            --accent: #06B6D4;
+            --accent-light: #67E8F9;
+            --bg-dark: #FEFEFE;
+            --bg-darker: #F8F9FA;
+            --card-bg: rgba(139, 92, 246, 0.08);
+            --glass: rgba(255, 255, 255, 0.8);
+            --border: rgba(139, 92, 246, 0.2);
+            --text-primary: #1F2937;
+            --text-secondary: #4B5563;
+            --text-muted: #6B7280;
+            --gradient-primary: linear-gradient(135deg, #8B5CF6 0%, #06B6D4 100%);
+            --gradient-accent: linear-gradient(135deg, #06B6D4 0%, #67E8F9 100%);
+            --shadow-glow: 0 0 40px rgba(139, 92, 246, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Animated Background */
+        .bg-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(6, 182, 212, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 40% 60%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
+                linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-darker) 100%);
+        }
+
+        .floating-orbs {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            opacity: 0.1;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .orb:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .orb:nth-child(2) {
+            width: 200px;
+            height: 200px;
+            top: 60%;
+            right: 10%;
+            animation-delay: -7s;
+        }
+
+        .orb:nth-child(3) {
+            width: 150px;
+            height: 150px;
+            bottom: 20%;
+            left: 20%;
+            animation-delay: -14s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 20px 0;
+            backdrop-filter: blur(20px);
+            background: rgba(254, 254, 254, 0.8);
+            border-bottom: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        nav.scrolled {
+            padding: 15px 0;
+            background: rgba(254, 254, 254, 0.95);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--gradient-primary);
+            border-radius: 1px;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 16px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 40px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--glass);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: var(--card-bg);
+            border-color: var(--primary);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            padding: 120px 0 80px;
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .hero-content {
+            animation: fadeInUp 1s ease 0.3s both;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 8px 16px;
+            font-size: 14px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(10px);
+        }
+
+        .hero-badge::before {
+            content: '✨';
+            font-size: 16px;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 6vw, 4rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            letter-spacing: -0.02em;
+        }
+
+        .hero h1 .gradient-text {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 48px;
+        }
+
+        .btn-hero {
+            padding: 16px 32px;
+            font-size: 16px;
+            border-radius: 50px;
+        }
+
+        .stats-preview {
+            display: flex;
+            gap: 32px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Hero Visual */
+        .hero-visual {
+            position: relative;
+            animation: fadeInUp 1s ease 0.6s both;
+        }
+
+        .phone-mockup {
+            position: relative;
+            width: 300px;
+            height: 600px;
+            margin: 0 auto;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+            border-radius: 40px;
+            border: 2px solid var(--border);
+            backdrop-filter: blur(20px);
+            overflow: hidden;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        }
+
+        .phone-screen {
+            margin: 20px;
+            height: calc(100% - 40px);
+            background: var(--bg-darker);
+            border-radius: 30px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .mockup-content {
+            padding: 40px 30px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .profile-card {
+            width: 100%;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 30px 20px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 20px;
+            animation: cardFloat 6s ease-in-out infinite;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .match-percentage {
+            background: rgba(6, 182, 212, 0.2);
+            color: var(--accent);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid rgba(6, 182, 212, 0.3);
+        }
+
+        @keyframes cardFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .floating-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .floating-element {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: var(--gradient-accent);
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: floatElement 8s linear infinite;
+        }
+
+        .floating-element:nth-child(1) { left: 10%; animation-delay: 0s; }
+        .floating-element:nth-child(2) { left: 90%; animation-delay: -2s; }
+        .floating-element:nth-child(3) { left: 50%; animation-delay: -4s; }
+
+        @keyframes floatElement {
+            0% { transform: translateY(100%); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(-100%); opacity: 0; }
+        }
+
+        /* Features Section */
+        .features {
+            padding: 120px 0;
+            position: relative;
+        }
+
+        .section-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .section-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 8px 16px;
+            font-size: 14px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(10px);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .section-title {
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .section-description {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 32px;
+        }
+
+        .feature-card {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 40px;
+            backdrop-filter: blur(20px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--gradient-primary);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-primary);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .feature-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* How It Works */
+        .how-it-works {
+            padding: 120px 0;
+            background: rgba(139, 92, 246, 0.02);
+        }
+
+        .steps-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            margin-top: 80px;
+        }
+
+        .step-card {
+            text-align: center;
+            position: relative;
+        }
+
+        .step-number {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: white;
+            font-size: 18px;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .step-visual {
+            width: 120px;
+            height: 120px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            margin: 40px auto 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .step-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .step-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 120px 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .cta-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .cta-title {
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            font-weight: 800;
+            margin-bottom: 24px;
+            line-height: 1.2;
+        }
+
+        .cta-description {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 20px 40px;
+            background: var(--gradient-primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 18px;
+            box-shadow: var(--shadow-glow);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 60px rgba(139, 92, 246, 0.4);
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        /* Footer */
+        footer {
+            padding: 60px 0 40px;
+            border-top: 1px solid var(--border);
+            background: var(--bg-darker);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 40px;
+        }
+
+        .footer-brand {
+            margin-bottom: 20px;
+        }
+
+        .footer-logo {
+            font-size: 24px;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .footer-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .footer-section h4 {
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 8px;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .footer-bottom {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+
+        
+        /* Logo Widget */
+        .logo-widget {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            z-index: 1001;
+            width: 80px;
+            height: 80px;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 50%; /* Make it circular */
+            padding: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-widget:hover {
+            transform: scale(1.05) translateY(-5px);
+        }
+
+        .logo-widget img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .hero-container {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                text-align: center;
+            }
+
+            .hero-visual {
+                order: -1;
+            }
+
+            .phone-mockup {
+                width: 250px;
+                height: 500px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .steps-container {
+                grid-template-columns: 1fr;
+                gap: 60px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .stats-preview {
+                justify-content: center;
+                gap: 24px;
+            }
+
+            .hero-actions {
+                flex-direction: column;
+                align-items: center;
+                gap: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .section-container {
+                padding: 0 16px;
+            }
+
+            .nav-container {
+                padding: 0 16px;
+            }
+
+            .hero {
+                padding: 100px 0 60px;
+            }
+
+            .features, .how-it-works, .cta-section {
+                padding: 80px 0;
+            }
+
+            .feature-card {
+                padding: 30px 20px;
+            }
+        }
+
+        /* Accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        .btn:focus-visible,
+        .nav-link:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Background -->
+    <div class="bg-container">
+        <div class="floating-orbs">
+            <div class="orb"></div>
+            <div class="orb"></div>
+            <div class="orb"></div>
+        </div>
+    </div>
+
+    <!-- Logo Widget -->
+    <a href="#home" class="logo-widget" aria-label="Back to top">
+        <img src="4.png" alt="Logo">
+    </a>
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <div class="logo">MatchMyVibe</div>
+            <div class="nav-links">
+                <a href="#home" class="nav-link active">Home</a>
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#how-it-works" class="nav-link">How it Works</a>
+                <a href="#about" class="nav-link">About</a>
+            </div>
+            <div class="nav-actions">
+                <a href="#" class="btn btn-secondary">Sign In</a>
+                <a href="#" class="btn btn-primary">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    AI-Powered Roommate Matching
+                </div>
+                
+                <h1>
+                    Find Your Perfect <span class="gradient-text">Roommate</span> Match
+                </h1>
+                
+                <p>
+                    Connect with compatible roommates through voice-first surveys and smart AI algorithms. 
+                    Skip the awkward interviews and find your vibe instantly.
+                </p>
+                
+                <div class="hero-actions">
+                    <a href="#" class="btn btn-primary btn-hero">
+                        🎤 Start Voice Survey
+                    </a>
+                    <a href="#" class="btn btn-secondary btn-hero">
+                        Watch Demo
+                    </a>
+                </div>
+                
+                <div class="stats-preview">
+                    <div class="stat-item">
+                        <span class="stat-number">2.5K+</span>
+                        <span class="stat-label">Happy Matches</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">94%</span>
+                        <span class="stat-label">Success Rate</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">15+</span>
+                        <span class="stat-label">Cities</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="hero-visual">
+                <div class="phone-mockup">
+                    <div class="phone-screen">
+                        <div class="mockup-content">
+                            <div class="profile-card">
+                                <div class="profile-avatar">A</div>
+                                <h4 style="margin-bottom: 8px;">Aditi Sharma</h4>
+                                <div class="match-percentage">92% Match</div>
+                                <p style="font-size: 14px; color: var(--text-secondary); margin-top: 12px;">
+                                    Night owl • Clean freak • Plant mom
+                                </p>
+                            </div>
+                            <div style="display: flex; gap: 20px; justify-content: center;">
+                                <div style="width: 50px; height: 50px; border-radius: 50%; background: rgba(239, 68, 68, 0.2); display: flex; align-items: center; justify-content: center; color: #ef4444; cursor: pointer;">✕</div>
+                                <div style="width: 50px; height: 50px; border-radius: 50%; background: rgba(16, 185, 129, 0.2); display: flex; align-items: center; justify-content: center; color: #10b981; cursor: pointer;">♥</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="floating-elements">
+                    <div class="floating-element"></div>
+                    <div class="floating-element"></div>
+                    <div class="floating-element"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="section-container">
+            <div class="section-header animate-on-scroll">
+                <div class="section-badge">Why Choose MatchMyVibe</div>
+                <h2 class="section-title">Smart Matching, <span class="gradient-text">Seamless Experience</span></h2>
+                <p class="section-description">
+                    Our AI-powered platform understands your personality, lifestyle, and preferences to find roommates who truly match your vibe.
+                </p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon">💬</div>
+                    <h3 class="feature-title">Swipe & Connect</h3>
+                    <p class="feature-description">
+                        Familiar Tinder-style interface makes finding your roommate fun and intuitive. Swipe right to connect, left to pass.
+                    </p>
+                </div>
+                
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon">🔮</div>
+                    <h3 class="feature-title">Numerology Insights</h3>
+                    <p class="feature-description">
+                        Fun Gen-Z touch with life path number compatibility analysis for an extra layer of cosmic roommate matching.
+                    </p>
+                </div>
+                
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon">🛡️</div>
+                    <h3 class="feature-title">Safe & Secure</h3>
+                    <p class="feature-description">
+                        Women-focused co-living spaces with privacy-first design, verified profiles, and bias-free matching algorithms.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="how-it-works">
+        <div class="section-container">
+            <div class="section-header animate-on-scroll">
+                <div class="section-badge">Simple Process</div>
+                <h2 class="section-title">How It <span class="gradient-text">Works</span></h2>
+                <p class="section-description">
+                    Get matched with your perfect roommate in just three simple steps. No lengthy forms, just natural conversations.
+                </p>
+            </div>
+            
+            <div class="steps-container">
+                <div class="step-card animate-on-scroll">
+                    <div class="step-number">1</div>
+                    <div class="step-visual">🎤</div>
+                    <h3 class="step-title">Voice Survey</h3>
+                    <p class="step-description">
+                        Chat with our AI assistant Misha about your lifestyle, preferences, and what you're looking for in a roommate.
+                    </p>
+                </div>
+                
+                <div class="step-card animate-on-scroll">
+                    <div class="step-number">2</div>
+                    <div class="step-visual">🔍</div>
+                    <h3 class="step-title">Smart Matching</h3>
+                    <p class="step-description">
+                        Our AI analyzes your responses and finds compatible roommates based on lifestyle, habits, and personality traits.
+                    </p>
+                </div>
+                
+                <div class="step-card animate-on-scroll">
+                    <div class="step-number">3</div>
+                    <div class="step-visual">💝</div>
+                    <h3 class="step-title">Connect & Move</h3>
+                    <p class="step-description">
+                        Swipe through matches, connect with compatible roommates, and find your perfect shared living space together.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Success Stories Section -->
+    <section class="features" style="background: rgba(6, 182, 212, 0.02);">
+        <div class="section-container">
+            <div class="section-header animate-on-scroll">
+                <div class="section-badge">Success Stories</div>
+                <h2 class="section-title">Real <span class="gradient-text">Connections</span></h2>
+                <p class="section-description">
+                    Thousands of happy roommates have found their perfect match through MatchMyVibe.
+                </p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card animate-on-scroll" style="background: var(--card-bg); padding: 32px;">
+                    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px;">
+                        <div style="width: 50px; height: 50px; border-radius: 50%; background: var(--gradient-primary); display: flex; align-items: center; justify-content: center; font-weight: bold;">S</div>
+                        <div>
+                            <h4 style="margin: 0; font-size: 1.1rem;">Sarah & Emma</h4>
+                            <p style="margin: 0; color: var(--accent); font-size: 0.9rem; font-weight: 600;">92% Compatible</p>
+                        </div>
+                    </div>
+                    <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                        "Found our dream shared apartment in Brooklyn through voice compatibility matching. We're both early birds who love clean spaces!"
+                    </p>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <span style="background: rgba(139, 92, 246, 0.2); color: var(--primary); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500;">Early Bird</span>
+                        <span style="background: rgba(139, 92, 246, 0.2); color: var(--primary); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500;">Clean</span>
+                        <span style="background: rgba(139, 92, 246, 0.2); color: var(--primary); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500;">Social</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card animate-on-scroll" style="background: var(--card-bg); padding: 32px;">
+                    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px;">
+                        <div style="width: 50px; height: 50px; border-radius: 50%; background: var(--gradient-accent); display: flex; align-items: center; justify-content: center; font-weight: bold;">M</div>
+                        <div>
+                            <h4 style="margin: 0; font-size: 1.1rem;">Maya & Priya</h4>
+                            <p style="margin: 0; color: var(--accent); font-size: 0.9rem; font-weight: 600;">89% Compatible</p>
+                        </div>
+                    </div>
+                    <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                        "Bonded over our love for plants and quiet study sessions. Our apartment is now a jungle of happiness and productivity!"
+                    </p>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <span style="background: rgba(6, 182, 212, 0.2); color: var(--accent); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500;">Plant Parent</span>
+                        <span style="background: rgba(6, 182, 212, 0.2); color: var(--accent); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500;">Studious</span>
+                        <span style="background: rgba(6, 182, 212, 0.2); color: var(--accent); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500;">Minimalist</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card animate-on-scroll" style="background: var(--card-bg); padding: 32px;">
+                    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px;">
+                        <div style="width: 50px; height: 50px; border-radius: 50%; background: var(--gradient-primary); display: flex; align-items: center; justify-content: center; font-weight: bold;">A</div>
+                        <div>
+                            <h4 style="margin: 0; font-size: 1.1rem;">Alex & Jordan</h4>
+                            <p style="margin: 0; color: var(--accent); font-size: 0.9rem; font-weight: 600;">95% Compatible</p>
+                        </div>
+                    </div>
+                    <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                        "Perfect match for our creative lifestyles and flexible work schedules. We inspire each other every day!"
+                    </p>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <span style="background: rgba(139, 92, 246, 0.2); color: var(--primary); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500;">Creative</span>
+                        <span style="background: rgba(139, 92, 246, 0.2); color: var(--primary); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500;">Flexible</span>
+                        <span style="background: rgba(139, 92, 246, 0.2); color: var(--primary); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500;">Pet Friendly</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Stats Section -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 32px; margin-top: 80px;">
+                <div class="feature-card animate-on-scroll" style="text-align: center; padding: 40px 20px;">
+                    <div style="font-size: 3rem; font-weight: 800; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 8px;">2.5K+</div>
+                    <div style="color: var(--text-secondary); font-weight: 500;">Successful Matches</div>
+                </div>
+                <div class="feature-card animate-on-scroll" style="text-align: center; padding: 40px 20px;">
+                    <div style="font-size: 3rem; font-weight: 800; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 8px;">94%</div>
+                    <div style="color: var(--text-secondary); font-weight: 500;">Satisfaction Rate</div>
+                </div>
+                <div class="feature-card animate-on-scroll" style="text-align: center; padding: 40px 20px;">
+                    <div style="font-size: 3rem; font-weight: 800; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 8px;">15+</div>
+                    <div style="color: var(--text-secondary); font-weight: 500;">Partner Cities</div>
+                </div>
+                <div class="feature-card animate-on-scroll" style="text-align: center; padding: 40px 20px;">
+                    <div style="font-size: 3rem; font-weight: 800; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 8px;">24/7</div>
+                    <div style="color: var(--text-secondary); font-weight: 500;">AI Support</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="section-container">
+            <div class="cta-content animate-on-scroll">
+                <h2 class="cta-title">Ready to Find Your <span class="gradient-text">Perfect Match?</span></h2>
+                <p class="cta-description">
+                    Join thousands of happy roommates who found their perfect living situation through MatchMyVibe. 
+                    Start your journey today with just your voice.
+                </p>
+                <a href="#" class="cta-button">
+                    🎤 Start Your Voice Survey
+                    <span style="font-size: 20px;">→</span>
+                </a>
+                <p style="margin-top: 20px; color: var(--text-muted); font-size: 14px;">
+                    Free to start • No credit card required • Get matched in minutes
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="footer-logo">MatchMyVibe</div>
+                <p class="footer-description">
+                    AI-powered roommate matching that understands your vibe. 
+                    Connect with compatible roommates through natural conversations and smart algorithms.
+                </p>
+                <div style="display: flex; gap: 16px; margin-top: 20px;">
+                    <a href="#" style="width: 40px; height: 40px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); text-decoration: none; transition: all 0.3s ease;">📘</a>
+                    <a href="#" style="width: 40px; height: 40px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); text-decoration: none; transition: all 0.3s ease;">🐦</a>
+                    <a href="#" style="width: 40px; height: 40px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); text-decoration: none; transition: all 0.3s ease;">📷</a>
+                    <a href="#" style="width: 40px; height: 40px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); text-decoration: none; transition: all 0.3s ease;">💼</a>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Product</h4>
+                <ul class="footer-links">
+                    <li><a href="#">How it Works</a></li>
+                    <li><a href="#">Features</a></li>
+                    <li><a href="#">Pricing</a></li>
+                    <li><a href="#">Success Stories</a></li>
+                    <li><a href="#">FAQ</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Company</h4>
+                <ul class="footer-links">
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Press</a></li>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Safety</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Cookie Policy</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2024 MatchMyVibe. All rights reserved. Made with ❤️ for finding your perfect roommate.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 100) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Active navigation link
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('section[id]');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.scrollY >= (sectionTop - 200)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Animate on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all elements with animate-on-scroll class
+        document.querySelectorAll('.animate-on-scroll').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Counter animation for stats
+        function animateCounters() {
+            const counters = document.querySelectorAll('.stat-number');
+            counters.forEach(counter => {
+                const target = counter.innerText;
+                const isPercentage = target.includes('%');
+                const isK = target.includes('K') || target.includes('k');
+                const isPlus = target.includes('+');
+                
+                let numTarget = parseFloat(target.replace(/[^\d.]/g, ''));
+                if (isK) numTarget *= 1000;
+                
+                let current = 0;
+                const increment = numTarget / 50;
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= numTarget) {
+                        current = numTarget;
+                        clearInterval(timer);
+                    }
+                    
+                    let displayValue = Math.floor(current);
+                    if (isK && displayValue >= 1000) {
+                        displayValue = (displayValue / 1000).toFixed(1) + 'K';
+                    }
+                    if (isPercentage) displayValue += '%';
+                    if (isPlus) displayValue += '+';
+                    
+                    counter.innerText = displayValue;
+                }, 50);
+            });
+        }
+
+        // Trigger counter animation when stats section is visible
+        const statsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateCounters();
+                    statsObserver.unobserve(entry.target);
+                }
+            });
+        });
+
+        const statsSection = document.querySelector('.stats-preview');
+        if (statsSection) {
+            statsObserver.observe(statsSection);
+        }
+
+        // Add loading animation to CTA button
+        document.querySelector('.cta-button').addEventListener('click', function(e) {
+            e.preventDefault();
+            const button = this;
+            const originalText = button.innerHTML;
+            
+            button.innerHTML = '🎤 Starting Survey... <div style="display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: white; animation: spin 1s linear infinite; margin-left: 8px;"></div>';
+            button.style.pointerEvents = 'none';
+            
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.style.pointerEvents = 'auto';
+                // Here you would typically redirect to the survey page
+                console.log('Redirecting to survey page...');
+            }, 2000);
+        });
+
+        // Add spin animation for loading
+        const spinKeyframes = `
+            @keyframes spin {
+                to { transform: rotate(360deg); }
+            }
+        `;
+        const style = document.createElement('style');
+        style.textContent = spinKeyframes;
+        document.head.appendChild(style);
+
+        // Enhanced phone mockup interaction
+        const profileCard = document.querySelector('.profile-card');
+        if (profileCard) {
+            setInterval(() => {
+                profileCard.style.transform = 'translateY(-5px)';
+                setTimeout(() => {
+                    profileCard.style.transform = 'translateY(0)';
+                }, 2000);
+            }, 4000);
+        }
+
+        // Mobile menu toggle (if needed)
+        function toggleMobileMenu() {
+            const navLinks = document.querySelector('.nav-links');
+            navLinks.classList.toggle('mobile-open');
+        }
+
+        // Add mobile menu styles
+        const mobileStyles = `
+            @media (max-width: 768px) {
+                .nav-links.mobile-open {
+                    display: flex;
+                    flex-direction: column;
+                    position: absolute;
+                    top: 100%;
+                    left: 0;
+                    width: 100%;
+                    background: var(--bg-darker);
+                    border: 1px solid var(--border);
+                    border-radius: 0 0 20px 20px;
+                    padding: 20px;
+                    gap: 16px;
+                }
+            }
+        `;
+        
+        const mobileStyleSheet = document.createElement('style');
+        mobileStyleSheet.textContent = mobileStyles;
+        document.head.appendChild(mobileStyleSheet);
+
+        // Parallax effect for floating orbs
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const orbs = document.querySelectorAll('.orb');
+            
+            orbs.forEach((orb, index) => {
+                const speed = 0.5 + (index * 0.2);
+                orb.style.transform = `translateY(${scrolled * speed}px)`;
+            });
+        });
+
+        // Add hover effects to feature cards
+        document.querySelectorAll('.feature-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-8px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        console.log('MatchMyVibe landing page loaded successfully! 🎉');
+    </script>
+</body>
+</html>-on-scroll">
+                    <div class="feature-icon">🎤</div>
+                    <h3 class="feature-title">Voice-First Matching</h3>
+                    <p class="feature-description">
+                        Natural conversations powered by advanced voice AI to understand your preferences better than any traditional form or questionnaire.
+                    </p>
+                </div>
+                
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon">🧠</div>
+                    <h3 class="feature-title">Smart AI Algorithm</h3>
+                    <p class="feature-description">
+                        Advanced machine learning analyzes compatibility across lifestyle, habits, schedules, and personality traits for perfect matches.
+                    </p>
+                </div>
+                
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon">🏠</div>
+                    <h3 class="feature-title">Room Optimization</h3>
+                    <p class="feature-description">
+                        Not just roommate matching - we suggest the perfect living space based on your preferences, budget, and location needs.
+                    </p>
+                </div>
+                
+                <div class="feature-card animate
