@@ -1,0 +1,2186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MatchMyVibe - Find Your Perfect Roommate</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --dark-bg: #0a0b1e;
+            --card-bg: rgba(255, 255, 255, 0.06);
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --border-color: rgba(255, 255, 255, 0.12);
+            --text-primary: #ffffff;
+            --text-secondary: #b8c5d1;
+            --text-muted: #8892a3;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Enhanced Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: 
+                radial-gradient(circle at 25% 25%, #667eea20 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, #764ba240 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, #4facfe15 0%, transparent 70%),
+                linear-gradient(135deg, #0a0b1e 0%, #1e1b3c 50%, #2d1b69 100%);
+            animation: breathe 20s ease-in-out infinite;
+            z-index: -2;
+        }
+
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .floating-element {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--accent-gradient);
+            border-radius: 50%;
+            animation: float 15s linear infinite;
+            opacity: 0.3;
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(180deg); }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.4); }
+            50% { box-shadow: 0 0 40px rgba(102, 126, 234, 0.8), 0 0 60px rgba(118, 75, 162, 0.4); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .page {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        /* Enhanced Navigation */
+        nav {
+            padding: 20px 0;
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .nav-item {
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: var(--text-primary);
+            background: var(--glass-bg);
+        }
+
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 2px;
+            background: var(--primary-gradient);
+            border-radius: 1px;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--glass-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            background: var(--card-bg);
+            border-color: rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Enhanced Hero Section */
+        .hero {
+            text-align: center;
+            padding: 120px 0;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: breathe 8s ease-in-out infinite;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            animation: fadeInUp 1s ease 0.3s both;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 8vw, 4.5rem);
+            font-weight: 800;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #ffffff 0%, #667eea 50%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 48px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            font-weight: 400;
+        }
+
+        .cta-button {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 20px 48px;
+            font-size: 1.125rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 16px 48px rgba(102, 126, 234, 0.4);
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        .cta-button:hover::before {
+            opacity: 1;
+        }
+
+        /* Enhanced Features Section */
+        .features {
+            padding: 120px 0;
+            position: relative;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: clamp(2rem, 5vw, 3rem);
+            margin-bottom: 80px;
+            color: var(--text-primary);
+            font-weight: 700;
+            position: relative;
+        }
+
+        .features h2::after {
+            content: '';
+            position: absolute;
+            bottom: -16px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--primary-gradient);
+            border-radius: 2px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 32px;
+        }
+
+        .feature-card {
+            background: var(--glass-bg);
+            padding: 40px 32px;
+            border-radius: 24px;
+            border: 1px solid var(--border-color);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--primary-gradient);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-icon {
+            width: 72px;
+            height: 72px;
+            background: var(--primary-gradient);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* Enhanced Voice Survey */
+        .voice-survey {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .survey-progress {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin-bottom: 48px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--primary-gradient);
+            width: 0%;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 4px;
+            position: relative;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .question-card {
+            background: var(--glass-bg);
+            padding: 48px;
+            border-radius: 24px;
+            margin-bottom: 32px;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .question-number {
+            color: #667eea;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .question-text {
+            font-size: 1.5rem;
+            margin-bottom: 40px;
+            line-height: 1.4;
+            font-weight: 500;
+        }
+
+        .voice-controls {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 32px;
+        }
+
+        .voice-btn {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-size: 32px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .voice-btn.record {
+            background: var(--secondary-gradient);
+            color: white;
+            box-shadow: 0 8px 32px rgba(245, 87, 108, 0.4);
+        }
+
+        .voice-btn.record:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 40px rgba(245, 87, 108, 0.6);
+        }
+
+        .voice-btn.record.recording {
+            animation: recordingPulse 1s infinite;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        @keyframes recordingPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            50% { transform: scale(1.05); box-shadow: 0 0 0 20px rgba(239, 68, 68, 0); }
+        }
+
+        .response-text {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 24px;
+            border-radius: 16px;
+            margin: 24px 0;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-style: italic;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .response-text.filled {
+            color: var(--text-primary);
+            font-style: normal;
+            background: rgba(102, 126, 234, 0.1);
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+
+        /* Enhanced Swipe Interface */
+        .swipe-container {
+            max-width: 420px;
+            margin: 0 auto;
+            padding: 60px 20px;
+            position: relative;
+            height: 700px;
+        }
+
+        .swipe-card {
+            position: absolute;
+            width: 100%;
+            height: 580px;
+            background: var(--glass-bg);
+            border-radius: 28px;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(20px);
+            cursor: grab;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .swipe-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary-gradient);
+        }
+
+        .swipe-card.dragging {
+            cursor: grabbing;
+            z-index: 10;
+        }
+
+        .swipe-card.swiped-right {
+            transform: translateX(400px) rotate(20deg);
+            opacity: 0;
+        }
+
+        .swipe-card.swiped-left {
+            transform: translateX(-400px) rotate(-20deg);
+            opacity: 0;
+        }
+
+        .card-content {
+            padding: 40px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .profile-image {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.4);
+        }
+
+        .profile-name {
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .match-score {
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+            padding: 8px 24px;
+            border-radius: 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 32px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .profile-details {
+            flex-grow: 1;
+            text-align: center;
+            width: 100%;
+        }
+
+        .detail-item {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .detail-icon {
+            font-size: 1.25rem;
+        }
+
+        .swipe-actions {
+            position: absolute;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 40px;
+        }
+
+        .action-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-size: 28px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn.reject {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 2px solid #ef4444;
+        }
+
+        .action-btn.accept {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+            border: 2px solid var(--success);
+        }
+
+        .action-btn:hover {
+            transform: scale(1.15);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Enhanced Matches Section */
+        .matches-section {
+            padding: 120px 0;
+        }
+
+        .matches-section h2 {
+            text-align: center;
+            font-size: clamp(2rem, 5vw, 3rem);
+            margin-bottom: 80px;
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .matches-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 32px;
+            margin-bottom: 80px;
+        }
+
+        .match-card {
+            background: var(--glass-bg);
+            border-radius: 24px;
+            padding: 32px;
+            border: 1px solid var(--border-color);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .match-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--accent-gradient);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .match-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .match-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .match-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .match-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 16px;
+            font-size: 1.25rem;
+        }
+
+        .match-info h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .match-compatibility {
+            color: var(--success);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .match-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .tag {
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        /* Enhanced Stats */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 32px;
+            margin: 80px 0;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 40px 24px;
+            background: var(--glass-bg);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(20px);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 1rem;
+        }
+
+        /* Enhanced Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+            background: var(--glass-bg);
+            margin: 5% auto;
+            padding: 48px;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 500px;
+            border: 1px solid var(--border-color);
+            position: relative;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.4);
+        }
+
+        .close {
+            color: var(--text-muted);
+            float: right;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            right: 24px;
+            top: 20px;
+            transition: color 0.3s ease;
+        }
+
+        .close:hover {
+            color: #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            border-top-color: #667eea;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Enhanced Preferences */
+        .preferences-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .preference-card {
+            background: var(--glass-bg);
+            padding: 24px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preference-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--primary-gradient);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .preference-card:hover {
+            border-color: #667eea;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.2);
+        }
+
+        .preference-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .preference-card.selected {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+        }
+
+        .preference-card.selected::before {
+            transform: scaleX(1);
+        }
+
+        .preference-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #667eea;
+            font-size: 1rem;
+        }
+
+        .preference-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Match Result Modal */
+        .match-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(15px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .match-modal.show {
+            display: flex;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .match-content {
+            background: var(--glass-bg);
+            padding: 60px;
+            border-radius: 28px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(20px);
+            position: relative;
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.4);
+        }
+
+        .match-celebration {
+            font-size: 4rem;
+            margin-bottom: 24px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-20px); }
+            60% { transform: translateY(-10px); }
+        }
+
+        .match-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .match-description {
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+            font-size: 1.1rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 16px;
+            }
+
+            .hero {
+                padding: 80px 0;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .nav-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .nav-menu {
+                order: -1;
+                gap: 20px;
+            }
+
+            .auth-buttons {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .features, .matches-section {
+                padding: 80px 0;
+            }
+
+            .features h2, .matches-section h2 {
+                font-size: 2rem;
+                margin-bottom: 48px;
+            }
+
+            .feature-grid, .matches-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+
+            .swipe-container {
+                height: 600px;
+                padding: 40px 16px;
+            }
+
+            .swipe-card {
+                height: 500px;
+            }
+
+            .card-content {
+                padding: 32px 24px;
+            }
+
+            .profile-image {
+                width: 120px;
+                height: 120px;
+                font-size: 2rem;
+            }
+
+            .profile-name {
+                font-size: 1.75rem;
+            }
+
+            .voice-survey {
+                padding: 40px 16px;
+            }
+
+            .question-card {
+                padding: 32px 24px;
+            }
+
+            .voice-btn {
+                width: 80px;
+                height: 80px;
+                font-size: 28px;
+            }
+
+            .modal-content {
+                padding: 32px 24px;
+                margin: 10% auto;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+
+            .stat-card {
+                padding: 32px 20px;
+            }
+
+            .stat-number {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .cta-button {
+                padding: 16px 32px;
+                font-size: 1rem;
+            }
+
+            .feature-card, .match-card {
+                padding: 24px 20px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .preferences-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Accessibility Improvements */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Focus styles for accessibility */
+        .btn:focus, .nav-item:focus, .preference-card:focus {
+            outline: 2px solid #667eea;
+            outline-offset: 2px;
+        }
+
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            :root {
+                --border-color: rgba(255, 255, 255, 0.3);
+                --text-secondary: #e0e0e0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-bg"></div>
+    <div class="floating-elements" id="floatingElements"></div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <div class="nav-content">
+                <div class="logo" onclick="showPage('home')">MatchMyVibe</div>
+                <div class="nav-menu">
+                    <div class="nav-item active" onclick="showPage('home')">Home</div>
+                    <div class="nav-item" onclick="showPage('survey')">Find Match</div>
+                    <div class="nav-item" onclick="showPage('swipe')">Swipe</div>
+                </div>
+                <div class="auth-buttons" id="authButtons">
+                    <a href="#" class="btn btn-secondary" onclick="openModal('loginModal')">Login</a>
+                    <a href="#" class="btn btn-primary" onclick="openModal('signupModal')">Sign Up</a>
+                </div>
+                <div class="auth-buttons hidden" id="userMenu">
+                    <span id="userName" style="color: #667eea; margin-right: 15px;">Welcome, User!</span>
+                    <a href="#" class="btn btn-secondary" onclick="logout()">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Home Page -->
+    <div id="homePage" class="page active">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1>Find Your Perfect Roommate</h1>
+                    <p>AI-powered matching that understands your vibe. Connect with compatible roommates through voice-first surveys and smart algorithms.</p>
+                    <button class="cta-button" onclick="startJourney()">🎤 Start Voice Survey</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features">
+            <div class="container">
+                <h2>Why Choose MatchMyVibe?</h2>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🎤</div>
+                        <h3>Voice-First Experience</h3>
+                        <p>Natural conversations powered by Omnidim.io Voice AI to understand your preferences better than any form.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🧠</div>
+                        <h3>Smart AI Matching</h3>
+                        <p>Advanced algorithms analyze compatibility across lifestyle, habits, and preferences for perfect matches.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🏠</div>
+                        <h3>Room Optimization</h3>
+                        <p>Not just roommate matching - we suggest the perfect room based on your preferences and availability.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📱</div>
+                        <h3>Swipe to Connect</h3>
+                        <p>Familiar Tinder-style interface makes finding your roommate fun and intuitive.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔮</div>
+                        <h3>Numerology Bonus</h3>
+                        <p>Fun Gen-Z touch with life path number compatibility for an extra matching dimension.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🛡️</div>
+                        <h3>Safe & Secure</h3>
+                        <p>Women-focused co-living spaces with privacy-first design and bias-free matching.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recent Matches Section -->
+        <section class="matches-section">
+            <div class="container">
+                <h2>Recent Success Stories</h2>
+                <div class="matches-grid" id="matchesGrid">
+                    <!-- Sample matches for demo -->
+                    <div class="match-card">
+                        <div class="match-header">
+                            <div class="match-avatar">S</div>
+                            <div class="match-info">
+                                <h4>Sarah & Emma</h4>
+                                <div class="match-compatibility">92% Compatible</div>
+                            </div>
+                        </div>
+                        <p>Found their dream shared space in Brooklyn through voice compatibility matching.</p>
+                        <div class="match-tags">
+                            <span class="tag">Early Bird</span>
+                            <span class="tag">Clean</span>
+                            <span class="tag">Social</span>
+                        </div>
+                    </div>
+                    <div class="match-card">
+                        <div class="match-header">
+                            <div class="match-avatar">M</div>
+                            <div class="match-info">
+                                <h4>Maya & Priya</h4>
+                                <div class="match-compatibility">89% Compatible</div>
+                            </div>
+                        </div>
+                        <p>Bonded over their love for plants and quiet study sessions in their shared apartment.</p>
+                        <div class="match-tags">
+                            <span class="tag">Plant Parent</span>
+                            <span class="tag">Studious</span>
+                            <span class="tag">Minimalist</span>
+                        </div>
+                    </div>
+                    <div class="match-card">
+                        <div class="match-header">
+                            <div class="match-avatar">A</div>
+                            <div class="match-info">
+                                <h4>Alex & Jordan</h4>
+                                <div class="match-compatibility">95% Compatible</div>
+                            </div>
+                        </div>
+                        <p>Perfect match for their creative lifestyles and flexible work schedules.</p>
+                        <div class="match-tags">
+                            <span class="tag">Creative</span>
+                            <span class="tag">Flexible</span>
+                            <span class="tag">Pet Friendly</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-number" id="successMatches">847</div>
+                        <div class="stat-label">Successful Matches</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">96%</div>
+                        <div class="stat-label">Satisfaction Rate</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="activeUsers">2.3k</div>
+                        <div class="stat-label">Active Users</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">12</div>
+                        <div class="stat-label">Partner Locations</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Voice Survey Page -->
+    <div id="surveyPage" class="page">
+        <div class="container">
+            <div class="voice-survey">
+                <div class="survey-progress">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                
+                <div class="question-card" id="questionCard">
+                    <div class="question-number" id="questionNumber">Question 1 of 5</div>
+                    <div class="question-text" id="questionText">Tell me about your social energy level. Are you more of an introvert or extrovert?</div>
+                    
+                    <div class="voice-controls">
+                        <button class="voice-btn record" id="recordBtn" onclick="toggleRecording()">🎤</button>
+                    </div>
+                    
+                    <div class="response-text" id="responseText">Click the microphone to record your response...</div>
+                    
+                    <div style="margin-top: 32px;">
+                        <button class="btn btn-secondary" onclick="skipQuestion()" style="margin-right: 12px;">Skip</button>
+                        <button class="btn btn-primary" onclick="nextQuestion()" id="nextBtn" disabled>Next</button>
+                    </div>
+                </div>
+
+                <div id="roomPreferences" class="hidden">
+                    <h3 style="margin-bottom: 40px; text-align: center; font-size: 1.5rem;">Room Preferences</h3>
+                    <div class="preferences-grid">
+                        <div class="preference-card" onclick="togglePreference(this, 'roomType', 'twin')" data-type="roomType" data-value="twin">
+                            <div class="preference-title">🛏️ Twin/Shared Room</div>
+                            <div class="preference-description">Share a room with your matched roommate</div>
+                        </div>
+                        <div class="preference-card" onclick="togglePreference(this, 'roomType', 'single')" data-type="roomType" data-value="single">
+                            <div class="preference-title">🚪 Single Room</div>
+                            <div class="preference-description">Have your own private space</div>
+                        </div>
+                        <div class="preference-card" onclick="togglePreference(this, 'floor', 'ground')" data-type="floor" data-value="ground">
+                            <div class="preference-title">🏠 Ground Floor</div>
+                            <div class="preference-description">Easy access, no stairs</div>
+                        </div>
+                        <div class="preference-card" onclick="togglePreference(this, 'floor', 'upper')" data-type="floor" data-value="upper">
+                            <div class="preference-title">🏢 Upper Floor</div>
+                            <div class="preference-description">Quiet and better views</div>
+                        </div>
+                        <div class="preference-card" onclick="togglePreference(this, 'budget', 'low')" data-type="budget" data-value="low">
+                            <div class="preference-title">💰 Budget-Friendly</div>
+                            <div class="preference-description">₹8,000 - ₹12,000/month</div>
+                        </div>
+                        <div class="preference-card" onclick="togglePreference(this, 'budget', 'mid')" data-type="budget" data-value="mid">
+                            <div class="preference-title">💳 Mid-Range</div>
+                            <div class="preference-description">₹12,000 - ₹18,000/month</div>
+                        </div>
+                        <div class="preference-card" onclick="togglePreference(this, 'budget', 'high')" data-type="budget" data-value="high">
+                            <div class="preference-title">💎 Premium</div>
+                            <div class="preference-description">₹18,000+/month</div>
+                        </div>
+                        <div class="preference-card" onclick="togglePreference(this, 'amenities', 'gym')" data-type="amenities" data-value="gym">
+                            <div class="preference-title">🏋️ Gym Access</div>
+                            <div class="preference-description">On-site fitness facilities</div>
+                        </div>
+                    </div>
+                    <div style="text-align: center; margin-top: 40px;">
+                        <button class="btn btn-primary" onclick="completePreferences()" style="padding: 16px 48px;">Complete Survey</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Swipe Page -->
+    <div id="swipePage" class="page">
+        <div class="container">
+            <div class="swipe-container">
+                <div class="swipe-card" id="currentCard">
+                    <div class="card-content">
+                        <div class="profile-image" id="profileImage">A</div>
+                        <div class="profile-name" id="profileName">Aditi Sharma</div>
+                        <div class="match-score" id="matchScore">87% Match</div>
+                        <div class="profile-details">
+                            <div class="detail-item">
+                                <span class="detail-icon">🎓</span>
+                                <span>Computer Science Student</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon">🌙</span>
+                                <span>Night Owl</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon">🧘</span>
+                                <span>Meditation & Yoga</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon">🍜</span>
+                                <span>Loves Cooking</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon">📚</span>
+                                <span>Quiet Study Sessions</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="swipe-actions">
+                    <button class="action-btn reject" onclick="swipeLeft()">✕</button>
+                    <button class="action-btn accept" onclick="swipeRight()">♥</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Match Result Modal -->
+    <div id="matchModal" class="match-modal">
+        <div class="match-content">
+            <div class="match-celebration">🎉</div>
+            <div class="match-title">It's a Match!</div>
+            <div class="match-description">You and <span id="matchedName">Aditi</span> are compatible! Start chatting to plan your move-in.</div>
+            <button class="btn btn-primary" onclick="closeMatchModal()" style="margin-top: 24px;">Start Chatting</button>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('loginModal')">&times;</span>
+            <h2 style="margin-bottom: 32px; text-align: center;">Welcome Back</h2>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" required placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" required placeholder="Enter your password">
+                </div>
+                <button class="btn btn-primary" type="submit" style="width: 100%; margin-top: 16px;">Sign In</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signupModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('signupModal')">&times;</span>
+            <h2 style="margin-bottom: 32px; text-align: center;">Join MatchMyVibe</h2>
+            <form onsubmit="handleSignup(event)">
+                <div class="form-group">
+                    <label for="signupName">Full Name</label>
+                    <input type="text" id="signupName" required placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" required placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" required placeholder="Create a password">
+                </div>
+                <div class="form-group">
+                    <label for="signupAge">Age</label>
+                    <input type="number" id="signupAge" required placeholder="Enter your age" min="18" max="35">
+                </div>
+                <button class="btn btn-primary" type="submit" style="width: 100%; margin-top: 16px;">Create Account</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Global Variables
+        let currentPage = 'home';
+        let currentQuestion = 0;
+        let isRecording = false;
+        let surveyResponses = [];
+        let userPreferences = {};
+        let currentCardIndex = 0;
+        let isLoggedIn = false;
+        
+        const questions = [
+            "Tell me about your social energy level. Are you more of an introvert or extrovert?",
+            "How do you prefer to spend your evenings after work or study?",
+            "What's your approach to cleanliness and organization in shared spaces?",
+            "How important is it for you to have similar schedules with your roommate?",
+            "What are your deal-breakers when it comes to living with someone?"
+        ];
+
+        const sampleProfiles = [
+            {
+                name: "Aditi Sharma",
+                initial: "A",
+                match: "87%",
+                details: ["🎓 Computer Science Student", "🌙 Night Owl", "🧘 Meditation & Yoga", "🍜 Loves Cooking", "📚 Quiet Study Sessions"]
+            },
+            {
+                name: "Priya Patel",
+                initial: "P",
+                match: "92%",
+                details: ["🎨 Graphic Designer", "🌅 Early Bird", "🎵 Music Lover", "🌱 Plant Parent", "☕ Coffee Enthusiast"]
+            },
+            {
+                name: "Kavya Singh",
+                initial: "K",
+                match: "89%",
+                details: ["📊 Marketing Professional", "🏃 Fitness Enthusiast", "🎪 Social Butterfly", "🍷 Wine & Dine", "📱 Tech Savvy"]
+            }
+        ];
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            createFloatingElements();
+            updateProgressBar();
+            animateStats();
+        });
+
+        // Create floating background elements
+        function createFloatingElements() {
+            const container = document.getElementById('floatingElements');
+            for (let i = 0; i < 20; i++) {
+                const element = document.createElement('div');
+                element.className = 'floating-element';
+                element.style.left = Math.random() * 100 + '%';
+                element.style.animationDelay = Math.random() * 15 + 's';
+                element.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                container.appendChild(element);
+            }
+        }
+
+        // Navigation Functions
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show selected page
+            document.getElementById(pageId + 'Page').classList.add('active');
+            
+            // Update navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            currentPage = pageId;
+        }
+
+        function startJourney() {
+            if (!isLoggedIn) {
+                openModal('signupModal');
+                return;
+            }
+            showPage('survey');
+        }
+
+        // Voice Survey Functions
+        function toggleRecording() {
+            const recordBtn = document.getElementById('recordBtn');
+            const responseText = document.getElementById('responseText');
+            
+            if (!isRecording) {
+                // Start recording
+                isRecording = true;
+                recordBtn.classList.add('recording');
+                recordBtn.innerHTML = '⏹️';
+                responseText.textContent = 'Recording... Speak now!';
+                
+                // Simulate recording for 3 seconds
+                setTimeout(() => {
+                    stopRecording();
+                }, 3000);
+            } else {
+                stopRecording();
+            }
+        }
+
+        function stopRecording() {
+            const recordBtn = document.getElementById('recordBtn');
+            const responseText = document.getElementById('responseText');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            isRecording = false;
+            recordBtn.classList.remove('recording');
+            recordBtn.innerHTML = '🎤';
+            
+            // Simulate AI processing
+            responseText.innerHTML = '<div class="loading"></div> Processing your response...';
+            
+            setTimeout(() => {
+                const responses = [
+                    "I'm definitely more of an introvert. I prefer quiet environments and smaller groups.",
+                    "I like to unwind with a good book or some music, maybe cook a nice meal.",
+                    "I believe in keeping common areas clean and organized. I'm pretty tidy by nature.",
+                    "Having similar schedules would be nice but not essential. Flexibility is key.",
+                    "Smoking indoors and loud parties late at night are absolute deal-breakers for me."
+                ];
+                
+                responseText.textContent = responses[currentQuestion] || "Thank you for your response!";
+                responseText.classList.add('filled');
+                nextBtn.disabled = false;
+            }, 2000);
+        }
+
+        function skipQuestion() {
+            const responseText = document.getElementById('responseText');
+            responseText.textContent = "Skipped - we'll ask you later!";
+            responseText.classList.add('filled');
+            document.getElementById('nextBtn').disabled = false;
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                updateQuestion();
+                updateProgressBar();
+            } else {
+                showRoomPreferences();
+            }
+        }
+
+        function updateQuestion() {
+            document.getElementById('questionNumber').textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+            document.getElementById('questionText').textContent = questions[currentQuestion];
+            document.getElementById('responseText').textContent = 'Click the microphone to record your response...';
+            document.getElementById('responseText').classList.remove('filled');
+            document.getElementById('nextBtn').disabled = true;
+        }
+
+        function updateProgressBar() {
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function showRoomPreferences() {
+            document.getElementById('questionCard').style.display = 'none';
+            document.getElementById('roomPreferences').classList.remove('hidden');
+            document.getElementById('progressBar').style.width = '100%';
+        }
+
+        function togglePreference(card, type, value) {
+            // Remove selection from other cards of the same type
+            document.querySelectorAll(`[data-type="${type}"]`).forEach(c => {
+                c.classList.remove('selected');
+            });
+            
+            // Select the clicked card
+            card.classList.add('selected');
+            userPreferences[type] = value;
+        }
+
+        function completePreferences() {
+            // Show completion animation
+            const btn = event.target;
+            btn.innerHTML = '<div class="loading"></div> Processing...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                showPage('swipe');
+                btn.innerHTML = 'Complete Survey';
+                btn.disabled = false;
+            }, 2000);
+        }
+
+        // Swipe Functions
+        let isDragging = false;
+        let startX = 0;
+        let startY = 0;
+        let currentX = 0;
+        let currentY = 0;
+
+        function initializeSwipeCard() {
+            const card = document.getElementById('currentCard');
+            if (!card) return;
+
+            // Add touch event listeners
+            card.addEventListener('mousedown', startDrag);
+            card.addEventListener('touchstart', startDrag, { passive: false });
+            
+            // Update card content
+            updateCardContent();
+        }
+
+        function updateCardContent() {
+            if (currentCardIndex >= sampleProfiles.length) {
+                showNoMoreMatches();
+                return;
+            }
+
+            const profile = sampleProfiles[currentCardIndex];
+            document.getElementById('profileImage').textContent = profile.initial;
+            document.getElementById('profileName').textContent = profile.name;
+            document.getElementById('matchScore').textContent = profile.match + ' Match';
+            
+            // Update details
+            const detailsContainer = document.querySelector('.profile-details');
+            detailsContainer.innerHTML = profile.details.map(detail => `
+                <div class="detail-item">
+                    <span class="detail-icon">${detail.split(' ')[0]}</span>
+                    <span>${detail.substring(detail.indexOf(' ') + 1)}</span>
+                </div>
+            `).join('');
+        }
+
+        function startDrag(e) {
+            isDragging = true;
+            startX = e.clientX || (e.touches && e.touches[0].clientX);
+            startY = e.clientY || (e.touches && e.touches[0].clientY);
+            
+            const card = document.getElementById('currentCard');
+            card.style.transition = 'none';
+            card.classList.add('dragging');
+            
+            // Add global event listeners
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('touchmove', drag, { passive: false });
+            document.addEventListener('mouseup', endDrag);
+            document.addEventListener('touchend', endDrag);
+        }
+
+        function drag(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+            
+            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+            const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+            
+            currentX = clientX - startX;
+            currentY = clientY - startY;
+            
+            const card = document.getElementById('currentCard');
+            const rotation = currentX * 0.1;
+            const opacity = Math.max(0.7, 1 - Math.abs(currentX) / 200);
+            
+            card.style.transform = `translate(${currentX}px, ${currentY}px) rotate(${rotation}deg)`;
+            card.style.opacity = opacity;
+            
+            // Show swipe indicators
+            if (Math.abs(currentX) > 50) {
+                if (currentX > 0) {
+                    card.style.borderColor = '#10b981';
+                    card.style.boxShadow = '0 0 30px rgba(16, 185, 129, 0.5)';
+                } else {
+                    card.style.borderColor = '#ef4444';
+                    card.style.boxShadow = '0 0 30px rgba(239, 68, 68, 0.5)';
+                }
+            } else {
+                card.style.borderColor = 'var(--border-color)';
+                card.style.boxShadow = '0 16px 48px rgba(0, 0, 0, 0.3)';
+            }
+        }
+
+        function endDrag() {
+            if (!isDragging) return;
+            isDragging = false;
+            
+            const card = document.getElementById('currentCard');
+            card.classList.remove('dragging');
+            
+            // Remove global event listeners
+            document.removeEventListener('mousemove', drag);
+            document.removeEventListener('touchmove', drag);
+            document.removeEventListener('mouseup', endDrag);
+            document.removeEventListener('touchend', endDrag);
+            
+            if (Math.abs(currentX) > 120) {
+                // Swipe threshold reached
+                if (currentX > 0) {
+                    performSwipe('right');
+                } else {
+                    performSwipe('left');
+                }
+            } else {
+                // Snap back to center
+                card.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                card.style.transform = 'translate(0, 0) rotate(0deg)';
+                card.style.opacity = '1';
+                card.style.borderColor = 'var(--border-color)';
+                card.style.boxShadow = '0 16px 48px rgba(0, 0, 0, 0.3)';
+            }
+            
+            currentX = 0;
+            currentY = 0;
+        }
+
+        function swipeLeft() {
+            performSwipe('left');
+        }
+
+        function swipeRight() {
+            performSwipe('right');
+        }
+
+        function performSwipe(direction) {
+            const card = document.getElementById('currentCard');
+            card.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+            
+            if (direction === 'right') {
+                card.style.transform = 'translateX(400px) rotate(20deg)';
+                card.style.opacity = '0';
+                
+                // Check for match (simulate 30% chance)
+                if (Math.random() < 0.3) {
+                    setTimeout(() => {
+                        showMatchModal();
+                    }, 300);
+                    return;
+                }
+            } else {
+                card.style.transform = 'translateX(-400px) rotate(-20deg)';
+                card.style.opacity = '0';
+            }
+            
+            setTimeout(() => {
+                currentCardIndex++;
+                if (currentCardIndex >= sampleProfiles.length) {
+                    showNoMoreMatches();
+                } else {
+                    resetCard();
+                    updateCardContent();
+                }
+            }, 500);
+        }
+
+        function resetCard() {
+            const card = document.getElementById('currentCard');
+            card.style.transition = 'none';
+            card.style.transform = 'translate(0, 0) rotate(0deg)';
+            card.style.opacity = '1';
+            card.style.borderColor = 'var(--border-color)';
+            card.style.boxShadow = '0 16px 48px rgba(0, 0, 0, 0.3)';
+            
+            // Force reflow
+            card.offsetHeight;
+            
+            setTimeout(() => {
+                card.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+            }, 10);
+        }
+
+        function showNoMoreMatches() {
+            const container = document.querySelector('.swipe-container');
+            container.innerHTML = `
+                <div style="text-align: center; padding: 60px 20px;">
+                    <div style="font-size: 4rem; margin-bottom: 24px;">🎯</div>
+                    <h3 style="margin-bottom: 16px;">No More Matches</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 32px;">
+                        You've seen all available matches. Check back later for new profiles!
+                    </p>
+                    <button class="btn btn-primary" onclick="currentCardIndex = 0; location.reload()">
+                        Start Over
+                    </button>
+                </div>
+            `;
+        }
+
+        function showMatchModal() {
+            const modal = document.getElementById('matchModal');
+            const matchedName = sampleProfiles[currentCardIndex].name.split(' ')[0];
+            document.getElementById('matchedName').textContent = matchedName;
+            modal.classList.add('show');
+        }
+
+        function closeMatchModal() {
+            document.getElementById('matchModal').classList.remove('show');
+            setTimeout(() => {
+                currentCardIndex++;
+                if (currentCardIndex >= sampleProfiles.length) {
+                    showNoMoreMatches();
+                } else {
+                    resetCard();
+                    updateCardContent();
+                }
+            }, 300);
+        }
+
+        // Modal Functions
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Authentication Functions
+        function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (email && password) {
+                // Simulate login
+                login(email.split('@')[0]);
+                closeModal('loginModal');
+            }
+        }
+
+        function handleSignup(event) {
+            event.preventDefault();
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const age = document.getElementById('signupAge').value;
+            
+            if (name && email && password && age) {
+                // Simulate signup
+                login(name.split(' ')[0]);
+                closeModal('signupModal');
+                showPage('survey');
+            }
+        }
+
+        function login(name) {
+            isLoggedIn = true;
+            document.getElementById('authButtons').classList.add('hidden');
+            document.getElementById('userMenu').classList.remove('hidden');
+            document.getElementById('userName').textContent = `Welcome, ${name}!`;
+        }
+
+        function logout() {
+            isLoggedIn = false;
+            document.getElementById('authButtons').classList.remove('hidden');
+            document.getElementById('userMenu').classList.add('hidden');
+            showPage('home');
+            
+            // Reset survey state
+            currentQuestion = 0;
+            surveyResponses = [];
+            userPreferences = {};
+            currentCardIndex = 0;
+            updateQuestion();
+            updateProgressBar();
+        }
+
+        // Animate statistics on home page
+        function animateStats() {
+            const animateNumber = (element, target) => {
+                let current = 0;
+                const increment = target / 50;
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        current = target;
+                        clearInterval(timer);
+                    }
+                    element.textContent = Math.floor(current).toLocaleString();
+                }, 50);
+            };
+
+            // Animate when page loads
+            setTimeout(() => {
+                const successElement = document.getElementById('successMatches');
+                const usersElement = document.getElementById('activeUsers');
+                
+                if (successElement) animateNumber(successElement, 847);
+                if (usersElement) {
+                    const timer = setInterval(() => {
+                        const current = parseFloat(usersElement.textContent);
+                        if (current >= 2.3) {
+                            clearInterval(timer);
+                            usersElement.textContent = '2.3k';
+                        } else {
+                            usersElement.textContent = (current + 0.1).toFixed(1) + 'k';
+                        }
+                    }, 100);
+                }
+            }, 1000);
+        }
+
+        // Close modals when clicking outside
+        window.addEventListener('click', function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    closeModal(modal.id);
+                }
+            });
+            
+            if (event.target === document.getElementById('matchModal')) {
+                closeMatchModal();
+            }
+        });
+
+        // Initialize swipe functionality when swipe page is shown
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show selected page
+            document.getElementById(pageId + 'Page').classList.add('active');
+            
+            // Update navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Find and activate the correct nav item
+            const navItems = document.querySelectorAll('.nav-item');
+            const pageMap = { 'home': 0, 'survey': 1, 'swipe': 2 };
+            if (pageMap[pageId] !== undefined) {
+                navItems[pageMap[pageId]].classList.add('active');
+            }
+            
+            currentPage = pageId;
+            
+            // Initialize swipe functionality if on swipe page
+            if (pageId === 'swipe') {
+                setTimeout(() => {
+                    initializeSwipeCard();
+                }, 100);
+            }
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            if (currentPage === 'swipe') {
+                if (event.key === 'ArrowLeft') {
+                    swipeLeft();
+                } else if (event.key === 'ArrowRight') {
+                    swipeRight();
+                }
+            }
+            
+            if (event.key === 'Escape') {
+                // Close any open modal
+                document.querySelectorAll('.modal').forEach(modal => {
+                    if (modal.style.display === 'block') {
+                        closeModal(modal.id);
+                    }
+                });
+                
+                if (document.getElementById('matchModal').classList.contains('show')) {
+                    closeMatchModal();
+                }
+            }
+        });
+
+        // Handle form submissions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Prevent default form submission
+            document.querySelectorAll('form').forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                });
+            });
+        });
+
+        // Responsive navigation for mobile
+        function toggleMobileNav() {
+            const navMenu = document.querySelector('.nav-menu');
+            navMenu.classList.toggle('mobile-open');
+        }
+
+        // Add loading states to buttons
+        function addLoadingState(button, text = 'Loading...') {
+            button.disabled = true;
+            button.innerHTML = `<div class="loading"></div> ${text}`;
+        }
+
+        function removeLoadingState(button, originalText) {
+            button.disabled = false;
+            button.innerHTML = originalText;
+        }
+
+        // Smooth scroll for any anchor links
+        document.addEventListener('click', function(e) {
+            if (e.target.tagName === 'A' && e.target.getAttribute('href').startsWith('#')) {
+                e.preventDefault();
+                const target = document.querySelector(e.target.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+        });
+
+        // Performance optimization: Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationPlayState = 'running';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all animated elements
+        document.querySelectorAll('.feature-card, .match-card, .stat-card').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
