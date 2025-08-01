@@ -163,6 +163,20 @@ def logout(request: Request):
 
     return RedirectResponse("/login", status_code=302)
 
+@app.get("/receive_traits")
+def get_traits(request: Request):
+    current_users = load_current_users()
+    if not current_users:
+        return JSONResponse({"status": "no user currently logged in"}, status_code=400)
+
+    email = current_users[0]
+    users = load_users()
+    if email not in users:
+        return JSONResponse({"status": "user not found"}, status_code=404)
+
+    traits = users[email].get("traits", {})
+    return JSONResponse({"traits": traits})
+
 @app.post("/receive_traits")
 async def receive_traits(request: Request):
     data = await request.json()
