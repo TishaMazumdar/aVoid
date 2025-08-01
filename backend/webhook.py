@@ -53,7 +53,7 @@ response = client.agent.create(
 
         "webhook": {
             "enabled": True,
-            "url": "https://avoid-80p2.onrender.com",
+            "url": "https://avoid-80p2.onrender.com/receive_traits",
             "include": ["extracted_variables"],
             "extracted_variables": [
             {"key": "daily_rhythm", "prompt": "Classify and extract the trait from keywords like 'morning' or 'night' related to productivity."},
