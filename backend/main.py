@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request, Form
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 import json
@@ -162,3 +162,30 @@ def logout(request: Request):
         save_current_users(current_users)
 
     return RedirectResponse("/login", status_code=302)
+
+@app.post("/receive_traits")
+async def receive_traits(request: Request):
+    data = await request.json()
+    print("Webhook received:", data)
+
+    extracted = data.get("extracted_variables", [])
+    
+    current_users = load_current_users()
+    if not current_users:
+        return JSONResponse({"status": "no user currently logged in"}, status_code=400)
+
+    email = current_users[0]
+
+    users = load_users()
+    if email not in users:
+        return JSONResponse({"status": "user not found"}, status_code=404)
+
+    # Store extracted traits
+    for trait in extracted:
+        key = trait["key"]
+        value = trait["value"]
+        users[email]["traits"][key] = value
+
+    save_users(users)
+
+    return JSONResponse({"status": "traits saved successfully"})
