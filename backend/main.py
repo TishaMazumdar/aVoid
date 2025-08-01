@@ -192,30 +192,31 @@ def map_trait_value(trait, answer, questions):
                         return group
     return answer  # fallback to raw answer if no match
 
+def get_active_email():
+    current_users = load_current_users()
+    return current_users[0] if current_users else None
+
 @app.post("/receive_traits")
 async def receive_traits(request: Request):
     data = await request.json()
     print("Webhook received:", data)
 
     extracted = data.get("call_report", {}).get("extracted_variables", {})
-    if not isinstance(extracted, dict):
-        return JSONResponse({"status": "invalid format"}, status_code=400)
+    if isinstance(extracted, list):
+        extracted = {item["key"]: item["value"] for item in extracted if "key" in item and "value" in item}
 
-    # Get current user email from session or current_users.json
-    current_users = load_current_users()
-    if not current_users:
+    # ✅ Get email from current_users.json instead of session
+    email = get_active_email()
+    if not email:
         return JSONResponse({"status": "no user currently logged in"}, status_code=400)
 
-    email = current_users[0] 
     users = load_users()
-
     if email not in users:
         return JSONResponse({"status": "user not found"}, status_code=404)
 
-    # Map extracted traits using your questions.json
+    # ✅ Save the traits
     questions = load_questions()
     users[email].setdefault("traits", {})
-
     for trait, answer in extracted.items():
         users[email]["traits"][trait] = map_trait_value(trait, str(answer), questions)
 
