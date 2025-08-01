@@ -177,28 +177,43 @@ def get_traits(request: Request):
     traits = users[email].get("traits", {})
     return JSONResponse({"traits": traits})
 
+def load_questions():
+    with open("backend/data/questions.json", "r", encoding="utf-8") as f:
+        return json.load(f)
+
+def map_trait_value(trait, answer, questions):
+    answer = answer.lower()
+    for q in questions:
+        if q["trait"] == trait:
+            for group, keywords in q["keywords"].items():
+                for keyword in keywords:
+                    if keyword in answer:
+                        return group
+    return answer  # fallback to raw answer if no match
+
 @app.post("/receive_traits")
 async def receive_traits(request: Request):
     data = await request.json()
     print("Webhook received:", data)
 
-    extracted = data.get("extracted_variables", [])
-    
+    extracted = data.get("extracted_variables", {})
+    if isinstance(extracted, list):
+        extracted = {item["key"]: item["value"] for item in extracted if "key" in item and "value" in item}
+
     current_users = load_current_users()
     if not current_users:
         return JSONResponse({"status": "no user currently logged in"}, status_code=400)
 
     email = current_users[0]
-
     users = load_users()
     if email not in users:
         return JSONResponse({"status": "user not found"}, status_code=404)
 
-    # Store extracted traits
-    for trait in extracted:
-        key = trait["key"]
-        value = trait["value"]
-        users[email]["traits"][key] = value
+    # Map extracted values to normalized trait values
+    questions = load_questions()
+    users[email].setdefault("traits", {})
+    for trait, answer in extracted.items():
+        users[email]["traits"][trait] = map_trait_value(trait, str(answer), questions)
 
     save_users(users)
 
