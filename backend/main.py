@@ -197,23 +197,25 @@ async def receive_traits(request: Request):
     data = await request.json()
     print("Webhook received:", data)
 
-    # Extract variables from call_report
     extracted = data.get("call_report", {}).get("extracted_variables", {})
-    if isinstance(extracted, list):
-        extracted = {item["key"]: item["value"] for item in extracted if "key" in item and "value" in item}
+    if not isinstance(extracted, dict):
+        return JSONResponse({"status": "invalid format"}, status_code=400)
 
-    # Always use session email
-    email = request.session.get("email")
-    if not email:
+    # Get current user email from session or current_users.json
+    current_users = load_current_users()
+    if not current_users:
         return JSONResponse({"status": "no user currently logged in"}, status_code=400)
 
+    email = current_users[0] 
     users = load_users()
+
     if email not in users:
         return JSONResponse({"status": "user not found"}, status_code=404)
 
-    # Map extracted values to normalized trait values
+    # Map extracted traits using your questions.json
     questions = load_questions()
     users[email].setdefault("traits", {})
+
     for trait, answer in extracted.items():
         users[email]["traits"][trait] = map_trait_value(trait, str(answer), questions)
 
