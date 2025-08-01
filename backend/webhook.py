@@ -9,6 +9,9 @@ OMNIDIM_API_KEY = os.getenv("OMNIDIM_API_KEY")
 # Initialize client
 client = Client(OMNIDIM_API_KEY)
 
+# Assuming you have the user's email available here after they log in
+user_email = "user@example.com"
+
 # Create an agent
 response = client.agent.create(
     name="Misha",
@@ -53,7 +56,7 @@ response = client.agent.create(
 
         "webhook": {
             "enabled": True,
-            "url": "https://avoid-80p2.onrender.com",
+            "url": f"https://avoid-80p2.onrender.com/webhook?user_email={user_email}",
             "include": ["extracted_variables"],
             "extracted_variables": [
             {"key": "daily_rhythm", "prompt": "Classify and extract the trait from keywords like 'morning' or 'night' related to productivity."},
