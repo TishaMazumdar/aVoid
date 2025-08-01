@@ -54,15 +54,15 @@ def login_user(email: str, password: str) -> bool:
 
 CURRENT_USERS_FILE = "backend/data/current_users.json"
 
-def load_current_users():
+def load_current_user():
     if not os.path.exists(CURRENT_USERS_FILE):
-        return []
+        return None
     with open(CURRENT_USERS_FILE, "r") as f:
         return json.load(f)
 
-def save_current_users(users):
+def save_current_user(email: str):
     with open(CURRENT_USERS_FILE, "w") as f:
-        json.dump(users, f, indent=2)
+        json.dump(email, f)
 
 # ---------- Routes ----------
 
@@ -126,11 +126,7 @@ def signup(
     save_users(users)
     request.session["email"] = email
 
-    # Add to current_users.json
-    current_users = load_current_users()
-    if email not in current_users:
-        current_users.append(email)
-        save_current_users(current_users)
+    save_current_user(email)
 
     return templates.TemplateResponse("index.html", {
         "request": request,
@@ -151,26 +147,21 @@ def login(request: Request, email: str = Form(...), password: str = Form(...)):
 
     request.session["email"] = email
 
-    current_users = load_current_users()
-    if email not in current_users:
-        current_users.append(email)
-        save_current_users(current_users)
+    save_current_user(email)
 
     return RedirectResponse("/", status_code=302)
 
 @app.get("/logout")
 def logout(request: Request):
     email = request.session.get("email")
-    current_users = load_current_users()
-    if email in current_users:
-        current_users.remove(email)
-        save_current_users(current_users)
+    if load_current_user() == email:
+        save_current_user(None)
     request.session.clear()
     return RedirectResponse("/login", status_code=302)
 
 @app.get("/receive_traits")
 def get_traits(request: Request):
-    current_users = load_current_users()
+    current_users = load_current_user()
     if not current_users:
         return JSONResponse({"status": "no user currently logged in"}, status_code=400)
 
@@ -196,10 +187,6 @@ def map_trait_value(trait, answer, questions):
                         return group
     return answer  # fallback to raw answer if no match
 
-def get_active_email():
-    current_users = load_current_users()
-    return current_users[0] if current_users else None
-
 @app.post("/receive_traits")
 async def receive_traits(request: Request):
     data = await request.json()
@@ -209,8 +196,7 @@ async def receive_traits(request: Request):
     if isinstance(extracted, list):
         extracted = {item["key"]: item["value"] for item in extracted if "key" in item and "value" in item}
 
-    # ✅ Get email from current_users.json instead of session
-    email = get_active_email()
+    email = email = load_current_user()
     if not email:
         return JSONResponse({"status": "no user currently logged in"}, status_code=400)
 
