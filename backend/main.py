@@ -197,7 +197,8 @@ async def receive_traits(request: Request):
     data = await request.json()
     print("Webhook received:", data)
 
-    extracted = data.get("extracted_variables", {})
+    # Extract variables from call_report
+    extracted = data.get("call_report", {}).get("extracted_variables", {})
     if isinstance(extracted, list):
         extracted = {item["key"]: item["value"] for item in extracted if "key" in item and "value" in item}
 
