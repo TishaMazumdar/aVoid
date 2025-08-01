@@ -5,7 +5,7 @@ import json
 import os
 
 # Initialize Firebase app
-cred = credentials.Certificate(os.getenv("FIREBASE_SERVICE_ACCOUNT_CREDENTIALS"))
+cred = credentials.Certificate(os.getenv("FIREBASE_KEY"))
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
