@@ -201,11 +201,11 @@ async def receive_traits(request: Request):
     if isinstance(extracted, list):
         extracted = {item["key"]: item["value"] for item in extracted if "key" in item and "value" in item}
 
-    current_users = load_current_users()
-    if not current_users:
+    # Always use session email
+    email = request.session.get("email")
+    if not email:
         return JSONResponse({"status": "no user currently logged in"}, status_code=400)
 
-    email = current_users[0]
     users = load_users()
     if email not in users:
         return JSONResponse({"status": "user not found"}, status_code=404)
