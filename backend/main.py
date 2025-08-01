@@ -5,6 +5,7 @@ from starlette.middleware.sessions import SessionMiddleware
 import json
 import os
 from dotenv import load_dotenv
+import hashlib
 
 load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -18,6 +19,9 @@ USERS_FILE = "backend/data/users.json"
 
 # ---------- Auth Logic ----------
 
+def hash_password(password: str) -> str:
+    return hashlib.sha256(password.encode()).hexdigest()
+
 def load_users():
     if not os.path.exists(USERS_FILE):
         return {}
@@ -28,37 +32,48 @@ def save_users(users):
     with open(USERS_FILE, "w") as f:
         json.dump(users, f, indent=2)
 
-def signup_user(username: str, password: str) -> bool:
+def signup_user(email: str, password: str) -> bool:
     users = load_users()
-    if username in users:
+    if email in users:
         return False
-    users[username] = {"password": password}
+    hashed = hash_password(password)
+    users[email] = {"password": hashed}
     save_users(users)
     return True
 
-def login_user(username: str, password: str) -> bool:
+def login_user(email: str, password: str) -> bool:
     users = load_users()
-    user = users.get(username)
-    return user is not None and user["password"] == password
+    user = users.get(email)
+    if not user:
+        return False
+    return user["password"] == hash_password(password)
 
 # ---------- Routes ----------
 
 @app.get("/")
 def home(request: Request):
-    username = request.session.get("username")
+    email = request.session.get("email")
     users = load_users()
 
-    if not username or username not in users:
-        return RedirectResponse("/login")
+    if not email or email not in users:
+        return RedirectResponse("/login", status_code=302)
 
-    user = users[username]
+    user = users[email]
     return templates.TemplateResponse("index.html", {
         "request": request,
         "name": user["name"],
         "dob": user["dob"]
     })
 
+@app.get("/login")
+def login_page(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
+
 @app.get("/signup")
+def signup_page(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
+
+@app.post("/signup")
 def signup(
     request: Request,
     name: str = Form(...),
@@ -72,25 +87,25 @@ def signup(
 
     users[email] = {
         "name": name,
-        "password": password,
+        "password": hash_password(password),
         "dob": dob
     }
     save_users(users)
-    request.session["username"] = email
+    request.session["email"] = email
     return templates.TemplateResponse("index.html", {
         "request": request,
-        "username": email,
+        "email": email,
         "signup_success": "Signup successful!"
     })
 
-@app.get("/login")
+@app.post("/login")
 def login(request: Request, email: str = Form(...), password: str = Form(...)):
     users = load_users()
     user = users.get(email)
-    if not user or user["password"] != password:
+    if not user or user["password"] != hash_password(password):
         return templates.TemplateResponse("index.html", {"request": request, "login_error": "Invalid email or password"})
 
-    request.session["username"] = email
+    request.session["email"] = email
     return RedirectResponse("/", status_code=302)
 
 @app.get("/logout")
