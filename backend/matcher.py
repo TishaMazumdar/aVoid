@@ -24,6 +24,19 @@ ACCEPTABLE_MATCHES = {
     "conflict_style": {}
 }
 
+# Numerology Chart
+numerology_chart = {
+    1: {"same": [1, 2, 5], "neutral": [3, 7, 8, 9], "challenges": [4, 6]},
+    2: {"same": [1, 2, 4, 6, 8], "neutral": [3, 9], "challenges": [5, 7]},
+    3: {"same": [3, 6, 9], "neutral": [1, 2, 5], "challenges": [4, 7, 8]},
+    4: {"same": [2, 4, 8], "neutral": [6, 7], "challenges": [1, 3, 5, 9]},
+    5: {"same": [1, 5, 7], "neutral": [3, 8, 9], "challenges": [2, 4, 6]},
+    6: {"same": [3, 6, 9], "neutral": [2, 4, 8], "challenges": [1, 5, 7]},
+    7: {"same": [4, 5, 7], "neutral": [1, 9], "challenges": [2, 3, 6, 8]},
+    8: {"same": [2, 4, 8], "neutral": [1, 5, 6], "challenges": [3, 7, 9]},
+    9: {"same": [3, 6, 9], "neutral": [1, 2, 5, 7], "challenges": [4, 8]}
+}
+
 def calculate_life_path_number(dob: str) -> int:
     """Calculate numerology life path number from DOB (yyyy-mm-dd)."""
     digits = [int(char) for char in dob if char.isdigit()]
@@ -36,15 +49,18 @@ def calculate_life_path_number(dob: str) -> int:
 
 def numerology_score(user_number: int, other_number: int) -> float:
     """Returns compatibility score between two life path numbers (out of 5)."""
-    diff = abs(user_number - other_number)
-    if diff == 0:
-        return 5
-    elif diff == 1:
-        return 3
-    elif diff == 2:
-        return 2
+    same = numerology_chart.get(user_number, {}).get("same", [])
+    neutral = numerology_chart.get(user_number, {}).get("neutral", [])
+    challenges = numerology_chart.get(user_number, {}).get("challenges", [])
+
+    if other_number in same:
+        return 5.0
+    elif other_number in neutral:
+        return 3.0
+    elif other_number in challenges:
+        return 0.0
     else:
-        return 0
+        return 1.0  # Unknown, fallback
 
 def compute_compatibility(traits1, traits2):
     """Simple matching: +2 for full match, +1 for partial (same group), 0 otherwise."""
