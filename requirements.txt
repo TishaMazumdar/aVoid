@@ -2,8 +2,7 @@ fastapi
 uvicorn[standard]
 pydantic
 python-dotenv
-firebase-admin
+Jinja2
 requests
-bcrypt
 python-multipart
 itsdangerous
