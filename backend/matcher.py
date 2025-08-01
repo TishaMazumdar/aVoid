@@ -91,52 +91,51 @@ def compute_logistics_score(user_prefs, room):
 
 
 def match_user_to_rooms(new_user, rooms):
-    best_room = None
-    best_score = -1
+    matched_rooms = []
+
+    user_life_path = calculate_life_path_number(new_user["dob"])
 
     for room in rooms:
         if len(room.get("occupants", [])) >= room["capacity"]:
             continue
 
+        # Compatibility score with current occupants
         compatibility_total = 0
+        occupants = room.get("occupants", [])
+        for occupant in occupants:
+            compatibility_total += compute_compatibility(new_user["traits"], occupant["traits"])
 
-        # Roommate compatibility
-        if room.get("occupants"):
-            for occupant in room["occupants"]:
-                compatibility_total += compute_compatibility(new_user["traits"], occupant["traits"])
-            compatibility_score = compatibility_total / len(room["occupants"])
-        else:
-            # No roommate yet, assume neutral compatibility
-            compatibility_score = 5
-
-        # Logistics preference score
-        logistics_score = compute_logistics_score(new_user["preferences"], room)
-
-        # Numerology for new user
-        user_life_path = calculate_life_path_number(new_user["dob"])
-        numerology_scores = []
-
-        # For each occupant, compare numerology
-        for occupant in room["occupants"]:
-            if "dob" in occupant:
-                occupant_path = calculate_life_path_number(occupant["dob"])
-                score = numerology_score(user_life_path, occupant_path)
-                numerology_scores.append(score)
-
-        # Average numerology score (0 if no one has DOB)
-        numerology_score_value = (
-            sum(numerology_scores) / len(numerology_scores)
-            if numerology_scores else 0
+        compatibility_score = (
+            compatibility_total / len(occupants) if occupants else 5.0
         )
 
-        # Debug print for individual scores
-        print(f"DEBUG | Room {room['room_id']} -> Compatibility Score: {compatibility_score}, Logistics Score: {logistics_score}, Numerology Score: {numerology_score_value}")
+        # Logistics match score
+        logistics_score = compute_logistics_score(new_user["preferences"], room)
 
-        # Weighted hybrid score
-        final_score = (0.7 * compatibility_score + 0.2 * logistics_score + 0.1 * numerology_score_value)
+        # Numerology score
+        numerology_scores = []
+        for occupant in occupants:
+            if "dob" in occupant:
+                occupant_path = calculate_life_path_number(occupant["dob"])
+                numerology_scores.append(numerology_score(user_life_path, occupant_path))
 
-        if final_score > best_score:
-            best_score = final_score
-            best_room = room["room_id"]
+        numerology_score_value = (
+            sum(numerology_scores) / len(numerology_scores) if numerology_scores else 0.0
+        )
 
-    return best_room, f"{round(best_score * 10, 1)}%"
+        # Weighted final score
+        final_score = (0.7 * compatibility_score +
+                       0.2 * logistics_score +
+                       0.1 * numerology_score_value)
+
+        # Append room result
+        matched_rooms.append({
+            "room_id": room["room_id"],
+            "score": f"{final_score * 10:.2f}%",
+            "roommates": [o["name"] for o in occupants]
+        })
+
+    # Sort by final score descending
+    sorted_rooms = sorted(matched_rooms, key=lambda r: float(r["score"].strip('%')), reverse=True)
+
+    return sorted_rooms
