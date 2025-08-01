@@ -6,6 +6,8 @@ import json
 import os
 from dotenv import load_dotenv
 import hashlib
+import re
+from datetime import datetime
 
 load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -48,6 +50,20 @@ def login_user(email: str, password: str) -> bool:
         return False
     return user["password"] == hash_password(password)
 
+# ---------- Sessions ----------
+
+SESSIONS_FILE = "backend/data/sessions.json"
+
+def load_sessions():
+    if not os.path.exists(SESSIONS_FILE):
+        return {}
+    with open(SESSIONS_FILE, "r") as f:
+        return json.load(f)
+
+def save_sessions(sessions):
+    with open(SESSIONS_FILE, "w") as f:
+        json.dump(sessions, f, indent=2)
+
 # ---------- Routes ----------
 
 @app.get("/")
@@ -82,16 +98,33 @@ def signup(
     dob: str = Form(...)
 ):
     users = load_users()
+
+    # Basic regex: must end in @<something>.com
+    if not re.match(r"[^@]+@[^@]+\.[cC][oO][mM]$", email):
+        return templates.TemplateResponse("index.html", {
+            "request": request,
+            "signup_error": "Enter a valid email ending with .com"
+        })
+
     if email in users:
-        return templates.TemplateResponse("index.html", {"request": request, "signup_error": "Email already registered"})
+        return templates.TemplateResponse("index.html", {
+            "request": request,
+            "signup_error": "Email already registered"
+        })
 
     users[email] = {
         "name": name,
         "password": hash_password(password),
-        "dob": dob
+        "dob": dob,
+        "vibe": "",
+        "traits": {},
+        "room_preferences": {},
+        "assigned_room": None
     }
+
     save_users(users)
     request.session["email"] = email
+
     return templates.TemplateResponse("index.html", {
         "request": request,
         "email": email,
@@ -106,9 +139,27 @@ def login(request: Request, email: str = Form(...), password: str = Form(...)):
         return templates.TemplateResponse("index.html", {"request": request, "login_error": "Invalid email or password"})
 
     request.session["email"] = email
+    sessions = load_sessions()
+    user = users[email]
+
+    sessions[email] = {
+        "name": user["name"],
+        "dob": user["dob"],
+        "logged_in": True,
+        "timestamp": datetime.now().isoformat()
+    }
+    save_sessions(sessions)
     return RedirectResponse("/", status_code=302)
 
 @app.get("/logout")
 def logout(request: Request):
+    email = request.session.get("email")
     request.session.clear()
-    return RedirectResponse("/login", status_code=302)
+
+    sessions = load_sessions()
+    if email in sessions:
+        sessions[email]["logged_in"] = False
+        sessions[email]["timestamp"] = datetime.now().isoformat()
+        save_sessions(sessions)
+
+    return RedirectResponse("/", status_code=302)
